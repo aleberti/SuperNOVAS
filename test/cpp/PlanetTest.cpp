@@ -26,8 +26,8 @@ int main() {
   if(!test.check("mass(invalid)", isnan(x.mass()))) n++;
   if(!test.check("mean_radius(invalid)", !x.mean_radius().is_valid())) n++;
 
-  if(!test.check("for_name(invalid)", !Planet::for_name("blah").has_value())) n++;
-  if(!test.check("for_naif_id(invalid)", !Planet::for_naif_id(-1).has_value())) n++;
+  if(!test.check("for_name(invalid)", !Planet::for_name("blah").is_valid())) n++;
+  if(!test.check("for_naif_id(invalid)", !Planet::for_naif_id(-1).is_valid())) n++;
 
   for(int i = 0; i < NOVAS_PLANETS; i++) {
     Planet pl = Planet((enum novas_planet) i);
@@ -36,10 +36,9 @@ int main() {
     if(!test.equals("naif_id(" + std::to_string(i) + ")", pl.naif_id(), (int) novas_to_naif_planet(pl.novas_id()))) n++;
     if(!test.equals("de_number(" + std::to_string(i) + ")", pl.de_number(), (int) novas_to_dexxx_planet(pl.novas_id()))) n++;
 
-    std::optional<Planet> opt = Planet::for_naif_id(novas_to_naif_planet((enum novas_planet) i));
-    if(!test.check("for_naif_id(" + std::to_string(i) + ").has_value()", opt.has_value())) n++;
-    if(!test.check("for_naif_id(" + std::to_string(i) + ")", opt.value().is_valid())) n++;
-    if(!test.equals("for_naif_id(" + std::to_string(i) + ").novas_id()", opt.value().novas_id(), i)) n++;
+    Planet opt = Planet::for_naif_id(novas_to_naif_planet((enum novas_planet) i));
+    if(!test.check("for_naif_id(" + std::to_string(i) + ").is_valid()", opt.is_valid())) n++;
+    if(!test.equals("for_naif_id(" + std::to_string(i) + ").novas_id()", opt.novas_id(), i)) n++;
 
     const Source *p1 = pl.copy();
     if(!test.check("to_string(catalog)", memcmp(p1->_novas_object(), pl._novas_object(), sizeof(object)) == 0)) n++;
@@ -50,11 +49,9 @@ int main() {
   double rmass[] = NOVAS_RMASS_INIT;
 
   for(int i = 0; i < NOVAS_PLANETS; i++) {
-     std::optional<Planet> opt = Planet::for_name(names[i]);
-     if(!test.check("for_name(" + names[i] + ")", opt.has_value())) n++;
-
-     Planet pl = opt.value();
-     if(!test.equals("for_name(" + names[i] + ")", pl.novas_id(), i)) n++;
+     Planet pl = Planet::for_name(names[i]);
+     if(!test.check("for_name(" + names[i] + ")", pl.is_valid())) n++;
+     if(!test.equals("for_name(" + names[i] + ").novas_id()", pl.novas_id(), i)) n++;
      if(!test.equals("type(" + names[i] + ")", pl.type(), NOVAS_PLANET)) n++;
      if(!test.equals("mean_radius(" + std::to_string(i) + ")", pl.mean_radius().m(), radius[i], 1e-3)) n++;
      if(!test.equals("mean_radius(" + std::to_string(i) + ")", pl.mass(), Constant::M_sun / rmass[i], 1e13)) n++;

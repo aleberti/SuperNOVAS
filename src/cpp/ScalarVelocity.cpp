@@ -281,4 +281,14 @@ const ScalarVelocity& ScalarVelocity::stationary() {
   return _stationary;
 }
 
+/**
+ * Returns a reference to a static instance of an undefined / invalid scalar velocity.
+ *
+ * @return    a reference to a standard undefined scalar velocity instance.
+ */
+const ScalarVelocity& ScalarVelocity::undefined() {
+  static const ScalarVelocity _undefined = ScalarVelocity();
+  return _undefined;
+}
+
 } // namespace supernovas

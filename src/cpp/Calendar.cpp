@@ -150,16 +150,16 @@ CalendarDate Calendar::date(const struct timespec *ts) const {
  * @param fmt   The date representation, such as novas::NOVAS_YMD, novas::NOVAS_DMY, or
  *              novas::NOVAS_MDY, specifying the order in which the year (Y), month (M), and day
  *              (D) components are expected in the input string representation.
- * @return      A new calendar date, in this calendar, or else std::nullopt if the string date
- *              could not be parsed.
+ * @return      A new calendar date, in this calendar, or else CalendarDate::undefined() if the
+ *              string date could not be parsed.
  *
  * @sa CalendarDate::to_string(), date()
  */
-std::optional<CalendarDate> Calendar::parse_date(const std::string& str, enum novas_date_format fmt) const {
+CalendarDate Calendar::parse_date(const std::string& str, enum novas_date_format fmt) const {
   double jd = novas_parse_date_format(_type, fmt, str.c_str(), NULL);
   if(isnan(jd)) {
     novas_trace_invalid("Calendar::parse_date");
-    return std::nullopt;
+    return CalendarDate::undefined();
   }
   return date(jd);
 }
@@ -665,6 +665,17 @@ std::string CalendarDate::to_string(enum novas_date_format fmt, int decimals) co
  */
 std::string CalendarDate::to_string(int decimals) const {
   return to_string(NOVAS_YMD, decimals);
+}
+
+/**
+ * Returns a reference to a statically defined standard undefined / invalid calendar date
+ * instance.
+ *
+ * @return  a reference to the standard undefined calendar date instance.
+ */
+const CalendarDate& CalendarDate::undefined() {
+  static CalendarDate _undefined = CalendarDate();
+  return _undefined;
 }
 
 

@@ -258,20 +258,30 @@ Galactic Apparent::galactic() const {
 
 /**
  * Returns the apparent unrefracted horizontal coordinates for this position for a geodetic
- * observer located on or near Earth's surface, or `std::nullopt` if the observer location is not
- * Earth bound.
+ * observer located on or near Earth's surface, or as an invalid set of coordinates if the observer
+ * location is not Earth bound. It's best practice to check if the returned coordinates are valid,
+ * e.g. as:
+ *
+ * ```c++
+ *  Apparent app = ...;
+ *  Horizontal h = app.to_horizontal();
+ *  if(!h) {
+ *    // Ooops, could not provide valid horizontal coordinates...
+ *    return;
+ *  }
+ * ```
  *
  * @return    the unrefracted (astrometric) horizontal position on the Earth-bound observer's
- *            sky, or else `std::nullopt` if the observer is not on or near Earth's surface.
+ *            sky, or else Horizontal::undefined() if the observer is not on or near Earth's surface.
  *
  * @sa equatorial(), ecliptic(), galactic()
  * @sa Horizontal::to_apparent(), GeodeticObserver
  */
-std::optional<Horizontal> Apparent::to_horizontal() const {
+Horizontal Apparent::to_horizontal() const {
 
   if(!_frame.observer().is_geodetic()) {
     novas_set_errno(EINVAL, "Apparent::to_horizontal()", "cannot convert for non-geodetic observer frame");
-    return std::nullopt;
+    return Horizontal::undefined();
   }
 
   double ra = 0.0, dec = 0.0, az = 0.0, el = 0.0;

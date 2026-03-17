@@ -106,13 +106,13 @@ int main() {
   if(!test.check("to_tirs().position()", b1.position() == Position(pos1))) n++;
   if(!test.check("to_tirs().velocity()", b1.velocity() == Velocity(vel1))) n++;
 
-  std::optional<Geometric> opt = a.to_itrs();
-  if(!test.check("to_itrs(gc).has_value()", !opt.has_value())) n++;
+  Geometric opt = a.to_itrs();
+  if(!test.check("to_itrs(gc).is_valid()", !opt.is_valid())) n++;
 
   opt = b.to_itrs(eop);
-  if(!test.check("to_itrs().has_value()", opt.has_value())) n++;
+  if(!test.check("to_itrs().is_valid()", opt.is_valid())) n++;
   else {
-    Geometric b2 = opt.value();
+    Geometric b2 = opt;
     novas_frame f = {};
 
     novas_make_frame(NOVAS_REDUCED_ACCURACY, frame.observer()._novas_observer(), frame.time()._novas_timespec(), eop.xp().mas(), eop.yp().mas(), &f);
@@ -124,16 +124,16 @@ int main() {
     if(!test.check("to_itrs().position()", b2.position() == Position(pos1))) n++;
     if(!test.check("to_itrs().velocity()", b2.velocity() == Velocity(vel1))) n++;
 
-    Geometric b3 = b2.to_itrs(eop).value();
+    Geometric b3 = b2.to_itrs(eop);
     if(!test.equals("to_itrs(ITRS).system_type()", b3.system_type(), NOVAS_ITRS)) n++;
     if(!test.check("to_itrs(ITRS).position()", b3.position() == b2.position())) n++;
     if(!test.check("to_itrs(ITRS).velocity()", b3.velocity() == b2.velocity())) n++;
   }
 
   opt = b.to_system(NOVAS_ITRS);
-  if(!test.check("to_itrs().has_value()", opt.has_value())) n++;
+  if(!test.check("to_itrs().is_valid()", opt.is_valid())) n++;
   else {
-    Geometric b2 = opt.value();
+    Geometric b2 = opt;
     novas_frame f = {};
 
     novas_make_frame(NOVAS_REDUCED_ACCURACY, frame.observer()._novas_observer(), frame.time()._novas_timespec(), eop.xp().mas(), eop.yp().mas(), &f);
@@ -150,9 +150,9 @@ int main() {
   novas_frame *f1 = (novas_frame *) b.frame()._novas_frame();
   f1->accuracy = NOVAS_FULL_ACCURACY;
   opt = b.to_itrs();
-  if(!test.check("to_itrs().has_value()", opt.has_value())) n++;
+  if(!test.check("to_itrs().is_valid()", opt.is_valid())) n++;
   else {
-    Geometric b2 = opt.value();
+    Geometric b2 = opt;
     novas_frame f = {};
 
     double xp, yp;

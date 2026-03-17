@@ -31,7 +31,7 @@ int main() {
   if(!test.equals("to_string(Roman)", b.to_string(), "Roman calendar")) n++;
   if(!test.equals("to_string(astronomical)", c.to_string(), "astronomical calendar")) n++;
 
-  if(!test.check("parse_date(blah)", !a.parse_date("blah").has_value())) n++;
+  if(!test.check("parse_date(blah)", !a.parse_date("blah").is_valid())) n++;
   if(!test.check("date(time=NAN)", !a.date(2000, 1, 1, TimeAngle(NAN)).is_valid())) n++;
 
   CalendarDate dx = a.date(NAN);
@@ -44,7 +44,7 @@ int main() {
   if(!test.equals("short_month_name() invalid", dx.short_month_name(), "inv")) n++;
   if(!test.equals("day_name() invalid", dx.day_name(), "invalid")) n++;
   if(!test.equals("short_day_name() invalid", dx.short_day_name(), "inv")) n++;
-  if(!test.check("parse_date(J2000)", a.parse_date("2000-01-01 12:00:00").has_value())) n++;
+  if(!test.check("parse_date(J2000)", a.parse_date("2000-01-01 12:00:00").is_valid())) n++;
 
   CalendarDate da = a.date(2000, 1, 1, TimeAngle::noon());
   if(!test.equals("J2000", da.jd(), NOVAS_JD_J2000)) n++;
@@ -78,7 +78,7 @@ int main() {
 
   if(!test.equals("unix_time()", da.unix_time(), UNIX_J2000)) n++;
 
-  CalendarDate db = b.parse_date("2000-01-01 12:00:00").value();
+  CalendarDate db = b.parse_date("2000-01-01 12:00:00");
 
   CalendarDate dc = c.date(NOVAS_JD_J2000);
   if(!test.equals("J2000 (gregorian vs astronomical)", da.jd(), dc.jd())) n++;

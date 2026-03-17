@@ -57,9 +57,8 @@ class Pressure;
 class Weather;
 class Site;
 class Observer;
-class   SpaceBasedObserver;
-class     SolarSystemObserver;
-class     GeocentricObserver;
+class   SolarSystemObserver;
+class   GeocentricObserver;
 class   GeodeticObserver;
 class CatalogEntry;
 class OrbitalSystem;
@@ -71,7 +70,6 @@ class     Planet;
 class     EphemerisSource;
 class     OrbitalSource;
 class Frame;
-class   GeodeticFrame;
 class Apparent;
 class Geometric;
 class ScalarEvolution;
@@ -326,7 +324,7 @@ public:
 
   std::string to_string() const;
 
-  static std::optional<Equinox> from_string(const std::string& name);
+  static Equinox from_string(const std::string& name);
 
   static Equinox from_system_type(enum novas::novas_reference_system system, double jd_tt = NOVAS_JD_J2000);
 
@@ -368,6 +366,9 @@ class Coordinate : public Validating {
 private:
   double _meters;         ///< [m] stored distance
 
+  /// Instantiate undefined coordinates.
+  Coordinate() : _meters(NAN) {}
+
 public:
   explicit Coordinate(double meters);
 
@@ -398,6 +399,8 @@ public:
   static const Coordinate& zero();
 
   static const Coordinate& at_Gpc();
+
+  static const Coordinate& undefined();
 };
 
 /**
@@ -509,7 +512,7 @@ public:
 
   virtual std::string to_string(enum novas::novas_separator_type separator = novas::NOVAS_SEP_UNITS_AND_SPACES, int decimals = 3) const;
 
-  static Angle& undefined();
+  static const Angle& undefined();
 
   static constexpr int east = 1;      ///< East direction sign, e.g `19.5 * Unit::deg * Angle::east` for 19.5 deg East.
 
@@ -715,6 +718,9 @@ class ScalarVelocity : public Validating {
 private:
   double _ms;       ///< [m/s] stored speed
 
+  /// Instantiates an undefined scalar velocity
+  ScalarVelocity() : _ms(NAN) {}
+
 public:
   explicit ScalarVelocity(double m_per_s);
 
@@ -764,6 +770,8 @@ public:
   static ScalarVelocity from_redshift(double z);
 
   static const ScalarVelocity& stationary();
+
+  static const ScalarVelocity& undefined();
 };
 
 /**
@@ -1281,6 +1289,12 @@ public:
 
   virtual bool is_geocentric() const;
 
+  /// @ingroup frame
+  Frame frame_at(const Time& time, enum novas::novas_accuracy accuracy = novas::NOVAS_FULL_ACCURACY) const;
+
+  /// @ingroup frame
+  Frame reduced_accuracy_frame_at(const Time& time) const;
+
   virtual std::string to_string() const;
 
   static GeodeticObserver on_earth(const Site& site, const EOP& eop);
@@ -1301,25 +1315,6 @@ public:
   static const Observer& undefined();
 };
 
-
-/**
- * An abstract observer location in space.
- *
- * @sa Frame
- * @ingroup observer
- */
-class SpaceBasedObserver : public Observer {
-protected:
-  explicit SpaceBasedObserver(enum novas::novas_observer_place type, const Position& pos = Position::origin(),
-          const Velocity& vel = Velocity::stationary()) : Observer(type, Site::undefined(), pos, vel) {}
-
-public:
-  /// @ingroup frame
-  std::optional<Frame> frame_at(const Time& time, enum novas::novas_accuracy accuracy = novas::NOVAS_FULL_ACCURACY) const;
-
-  /// @ingroup frame
-  Frame reduced_accuracy_frame_at(const Time& time) const;
-};
 
 /**
  * An observer location at a geodetic (longitude, latitude, altitude) location at the surface or
@@ -1356,12 +1351,6 @@ public:
 
   const EOP& eop() const;
 
-  /// @ingroup frame
-  std::optional<GeodeticFrame> frame_at(const Time& time, enum novas::novas_accuracy accuracy = novas::NOVAS_FULL_ACCURACY) const;
-
-  /// @ingroup frame
-  GeodeticFrame reduced_accuracy_frame_at(const Time& time) const;
-
   std::string to_string() const override;
 };
 
@@ -1372,7 +1361,7 @@ public:
  * @sa GeodeticObserver
  * @ingroup observer
  */
-class GeocentricObserver : public SpaceBasedObserver {
+class GeocentricObserver : public Observer {
 public:
   GeocentricObserver();
 
@@ -1395,7 +1384,7 @@ public:
  *
  * @ingroup observer
  */
-class SolarSystemObserver : public SpaceBasedObserver {
+class SolarSystemObserver : public Observer {
 public:
 
   SolarSystemObserver();
@@ -1439,7 +1428,7 @@ public:
 
   static Calendar astronomical();
 
-  std::optional<CalendarDate> parse_date(const std::string& str, enum novas::novas_date_format fmt = novas::NOVAS_YMD) const;
+  CalendarDate parse_date(const std::string& str, enum novas::novas_date_format fmt = novas::NOVAS_YMD) const;
 
   std::string to_string() const;
 };
@@ -1464,6 +1453,9 @@ private:
   int _mday;
   TimeAngle _time_of_day;
   double _jd;
+
+  /// Instantiates an undefined calendar date in the astronomical calendar.
+  CalendarDate() : _calendar(Calendar::astronomical()), _year(-1), _month(-1), _mday(-1), _time_of_day(NAN), _jd(NAN) {}
 
 public:
   CalendarDate(const Calendar& calendar, int year, int month, int day, const TimeAngle& time = TimeAngle::zero());
@@ -1537,6 +1529,8 @@ public:
   std::string to_string(enum novas::novas_date_format fmt = novas::NOVAS_YMD, int decimals = 0) const;
 
   std::string to_string(int decimals) const;
+
+  static const CalendarDate& undefined();
 };
 
 /**
@@ -1691,7 +1685,7 @@ public:
  * (using the is_valid() method), or else use the static Frame::create() function to return an
  * optional.
  *
- * @sa GeodeticFrame, Source
+ * @sa Source
  * @ingroup frame
  */
 class Frame : public Validating {
@@ -1705,11 +1699,8 @@ private:
 
   void diurnal_correct();
 
-protected:
-  Frame(const Observer& obs, const Time& time, enum novas::novas_accuracy accuracy = novas::NOVAS_FULL_ACCURACY);
-
 public:
-  virtual ~Frame() {};
+  Frame(const Observer& obs, const Time& time, enum novas::novas_accuracy accuracy = novas::NOVAS_FULL_ACCURACY);
 
   const novas::novas_frame* _novas_frame() const;
 
@@ -1723,35 +1714,11 @@ public:
 
   Geometric geometric(const Position& p, const Velocity& v, enum novas::novas_reference_system system = novas::NOVAS_TOD) const;
 
-  virtual std::string to_string() const;
-
-  static std::optional<Frame> create(const Observer& obs, const Time& time, enum novas::novas_accuracy accuracy = novas::NOVAS_FULL_ACCURACY);
+  std::string to_string() const;
 
   static Frame reduced_accuracy(const Observer& obs, const Time& time);
 
   static const Frame& undefined();
-};
-
-/**
- * An observing frame specifically for an observer located on or near Earth's surface. It is not
- * necessary to have this kind of a frame for a geodetic observer, but it can make usage a little
- * simpler for them than the generic frames, eliminating some optionals, and providing direct
- * return values instead.
- *
- * @sa GeodeticObserver, Source
- * @ingroup frame
- */
-class GeodeticFrame : public Frame {
-protected:
-  GeodeticFrame(const GeodeticObserver& obs, const Time& time, enum novas::novas_accuracy accuracy = novas::NOVAS_FULL_ACCURACY);
-
-public:
-
-  std::string to_string() const override;
-
-  static std::optional<GeodeticFrame> create(const GeodeticObserver& obs, const Time& time, enum novas::novas_accuracy accuracy = novas::NOVAS_FULL_ACCURACY);
-
-  static GeodeticFrame reduced_accuracy(const GeodeticObserver& obs, const Time& time);
 };
 
 /**
@@ -1798,31 +1765,22 @@ public:
   Angle angle_to(const Source& source, const Frame& frame) const;
 
   /// @ingroup time
-  Time rises_above(const Angle& el, const GeodeticFrame &frame, novas::RefractionModel ref = NULL, const Weather& weather = Weather::standard()) const;
+  Time rises_above(const Angle& el, const Frame &frame, novas::RefractionModel ref = NULL, const Weather& weather = Weather::standard()) const;
 
   /// @ingroup time
-  std::optional<Time> rises_above(const Angle& el, const Frame &frame, novas::RefractionModel ref = NULL, const Weather& weather = Weather::standard()) const;
+  Time transits(const Frame &frame) const;
 
   /// @ingroup time
-  Time transits(const GeodeticFrame &frame) const;
-
-  /// @ingroup time
-  std::optional<Time> transits(const Frame &frame) const;
-
-  /// @ingroup time
-  Time sets_below(const Angle& el, const GeodeticFrame &frame, novas::RefractionModel ref = NULL, const Weather& weather = Weather::standard()) const;
-
-  /// @ingroup time
-  std::optional<Time> sets_below(const Angle& el, const Frame &frame, novas::RefractionModel ref = NULL, const Weather& weather = Weather::standard()) const;
+  Time sets_below(const Angle& el, const Frame &frame, novas::RefractionModel ref = NULL, const Weather& weather = Weather::standard()) const;
 
   /// @ingroup tracking
-  std::optional<EquatorialTrack> equatorial_track(const Frame &frame, double range_seconds = Unit::hour) const;
+  EquatorialTrack equatorial_track(const Frame &frame, double range_seconds = Unit::hour) const;
 
   /// @ingroup tracking
-  std::optional<EquatorialTrack> equatorial_track(const Frame &frame, const Interval& range) const;
+  EquatorialTrack equatorial_track(const Frame &frame, const Interval& range) const;
 
   /// @ingroup tracking
-  std::optional<HorizontalTrack> horizontal_track(const Frame &frame, novas::RefractionModel ref = NULL, const Weather& weather = Weather::standard()) const;
+  HorizontalTrack horizontal_track(const Frame &frame, novas::RefractionModel ref = NULL, const Weather& weather = Weather::standard()) const;
 
   virtual std::string to_string() const = 0;
 
@@ -1958,6 +1916,9 @@ public:
  * @ingroup source
  */
 class Planet : public SolarSystemSource {
+private:
+  Planet();
+
 public:
   explicit Planet(enum novas::novas_planet number);
 
@@ -1979,9 +1940,11 @@ public:
   /// @ingroup geometric
   Geometric approx_geometric_in(const Frame& frame) const;
 
-  static std::optional<Planet> for_naif_id(long naif);
+  std::string to_string() const override;
 
-  static std::optional<Planet> for_name(const std::string& name);
+  static Planet for_naif_id(long naif);
+
+  static Planet for_name(const std::string& name);
 
   static const Planet& mercury();
 
@@ -2010,8 +1973,6 @@ public:
   static const Planet& emb();
 
   static const Planet& pluto_system();
-
-  std::string to_string() const override;
 };
 
 /**
@@ -2303,7 +2264,7 @@ public:
   Galactic galactic() const;
 
   /// @ingroup nonequatorial
-  std::optional<Horizontal> to_horizontal() const;
+  Horizontal to_horizontal() const;
 
   std::string to_string(int decimals = 3) const;
 
@@ -2385,7 +2346,7 @@ public:
 
   Geometric to_tirs() const;
 
-  std::optional<Geometric> to_itrs(const EOP& eop = EOP::undefined()) const;
+  Geometric to_itrs(const EOP& eop = EOP::undefined()) const;
 
   std::string to_string(int decimals = 3) const;
 
@@ -2436,16 +2397,10 @@ public:
   Horizontal to_unrefracted(novas::RefractionModel ref, const Weather& weather = Weather::standard(), const Time& time = Time::undefined());
 
   /// @ingroup apparent
-  std::optional<Apparent> to_apparent(const Frame& frame, double rv = 0.0, double distance = Unit::Gpc) const;
+  Apparent to_apparent(const Frame& frame, double rv = 0.0, double distance = Unit::Gpc) const;
 
   /// @ingroup apparent
-  std::optional<Apparent> to_apparent(const Frame& frame, const ScalarVelocity& rv = ScalarVelocity::stationary(), const Coordinate& distance = Coordinate::at_Gpc()) const;
-
-  /// @ingroup apparent
-  Apparent to_apparent(const GeodeticFrame& frame, double rv = 0.0, double distance = Unit::Gpc) const;
-
-  /// @ingroup apparent
-  Apparent to_apparent(const GeodeticFrame& frame, const ScalarVelocity& rv = ScalarVelocity::stationary(), const Coordinate& distance = Coordinate::at_Gpc()) const;
+  Apparent to_apparent(const Frame& frame, const ScalarVelocity& rv = ScalarVelocity::stationary(), const Coordinate& distance = Coordinate::at_Gpc()) const;
 
   std::string to_string(enum novas::novas_separator_type separator = novas::NOVAS_SEP_UNITS_AND_SPACES, int decimals = 3) const override;
 
@@ -2502,6 +2457,9 @@ private:
 
 protected:
 
+  Track() : _ref_time(Time::undefined()), _range(Interval::zero()), _lon(ScalarEvolution::undefined()), _lat(ScalarEvolution::undefined()),
+    _r(ScalarEvolution::undefined()), _z(ScalarEvolution::undefined()) {}
+
   Track(const Time& ref_time, const Interval& range, const ScalarEvolution& lon, const ScalarEvolution& lat, const ScalarEvolution& r, const ScalarEvolution& z);
 
   Track(const novas::novas_track *track, const Interval& range);
@@ -2532,17 +2490,17 @@ public:
 
   const ScalarEvolution& redshift_evolution() const;
 
-  std::optional<Angle> longitude_at(const Time& time) const;
+  Angle longitude_at(const Time& time) const;
 
-  std::optional<Angle> latitude_at(const Time& time) const;
+  Angle latitude_at(const Time& time) const;
 
-  std::optional<Coordinate> distance_at(const Time& time) const;
+  Coordinate distance_at(const Time& time) const;
 
-  std::optional<ScalarVelocity> radial_velocity_at(const Time& time) const;
+  ScalarVelocity radial_velocity_at(const Time& time) const;
 
-  std::optional<double> redshift_at(const Time& time) const;
+  double redshift_at(const Time& time) const;
 
-  virtual std::optional<CoordType> projected_at(const Time& time) const = 0;
+  virtual CoordType projected_at(const Time& time) const = 0;
 };
 
 /**
@@ -2558,6 +2516,9 @@ public:
  */
 class HorizontalTrack : public Track<Horizontal> {
 private:
+  /// Imnstantiates an undefined horizontal track.
+  HorizontalTrack() : Track() {}
+
   HorizontalTrack(const novas::novas_track *track, const Interval& range);
 
 public:
@@ -2565,9 +2526,11 @@ public:
           const ScalarEvolution& azimuth, const ScalarEvolution& elevation, const ScalarEvolution& distance = ScalarEvolution::stationary(Unit::Gpc),
           const ScalarEvolution& z = ScalarEvolution::undefined());
 
-  std::optional<Horizontal> projected_at(const Time& time) const override;
+  Horizontal projected_at(const Time& time) const override;
 
-  static std::optional<HorizontalTrack> from_novas_track(const novas::novas_track *track, const Interval& range);
+  static HorizontalTrack from_novas_track(const novas::novas_track *track, const Interval& range);
+
+  static const HorizontalTrack& undefined();
 };
 
 /**
@@ -2585,6 +2548,9 @@ class EquatorialTrack : public Track<Equatorial> {
 private:
   Equinox _system;    ///< equatorial coordinate reference system
 
+  /// Instantiates an undefined equatorial track.
+  EquatorialTrack() : Track(), _system(Equinox::undefined()) {}
+
   EquatorialTrack(const Equinox& system, const novas::novas_track *track, const Interval& range);
 
 public:
@@ -2592,9 +2558,9 @@ public:
           const ScalarEvolution& ra, const ScalarEvolution& dec, const ScalarEvolution& distance = ScalarEvolution::stationary(Unit::Gpc),
           const ScalarEvolution& z = ScalarEvolution::undefined());
 
-  std::optional<Equatorial> projected_at(const Time& time) const override;
+  Equatorial projected_at(const Time& time) const override;
 
-  static std::optional<EquatorialTrack> from_novas_track(const Equinox& system, const novas::novas_track *track, const Interval& range);
+  static EquatorialTrack from_novas_track(const Equinox& system, const novas::novas_track *track, const Interval& range);
 };
 
 

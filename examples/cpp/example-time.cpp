@@ -51,10 +51,10 @@ int main() {
   //   flexibility on how the components are separated, but they must be year,
   //   month, day, then optionally time and possibly time zone also. For
   //   example:
-  std::optional<CalendarDate> date = Calendar::gregorian().parse_date("2025-01-29T18:09:29.333+0200");
+  CalendarDate date = Calendar::gregorian().parse_date("2025-01-29T18:09:29.333+0200");
 
   // Check that the parsing was successful.
-  if(!date.has_value()) {
+  if(!date) {
     std::cerr << "ERROR! could not parse date string.\n";
     return 1;
   }
@@ -67,7 +67,7 @@ int main() {
   // - Next, convert that date to an astronomical time of a specific time
   //   scale. Let's say the above date was on the TAI... (It could be UTC, or
   //   GPS, or TDB...)
-  time1 = date.value().to_time(eop, NOVAS_TAI);
+  time1 = date.to_time(eop, NOVAS_TAI);
 
   // -------------------------------------------------------------------------
   // 1.c. Dates from broken-down time

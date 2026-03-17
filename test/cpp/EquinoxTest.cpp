@@ -32,11 +32,11 @@ int main() {
   if(!test.check("is_valid(system = TIRS)", !Equinox::from_system_type(NOVAS_TIRS, NOVAS_JD_J2000).is_valid())) n++;
   if(!test.check("is_valid(system = ITRS)", !Equinox::from_system_type(NOVAS_ITRS, NOVAS_JD_J2000).is_valid())) n++;
 
-  std::optional<Equinox> o = Equinox::from_string("blah");
-  if(!test.check("invalid('blah')", !o.has_value())) n++;
+  Equinox o = Equinox::from_string("blah");
+  if(!test.check("invalid('blah')", !o.is_valid())) n++;
 
   o = Equinox::from_string("Z");
-  if(!test.check("invalid('Z')", !o.has_value())) n++;
+  if(!test.check("invalid('Z')", !o.is_valid())) n++;
 
   Equinox icrs = Equinox::icrs();
   if(!test.check("icrs().is_valid()", icrs.is_valid())) n++;
@@ -45,12 +45,12 @@ int main() {
   if(!test.equals("icrs().jd()", icrs.jd(), NOVAS_JD_J2000)) n++;
   if(!test.equals("icrs().mjd()", icrs.mjd(), NOVAS_JD_J2000 - NOVAS_JD_MJD0)) n++;
   if(!test.equals("icrs().to_string()", icrs.to_string(), NOVAS_SYSTEM_ICRS)) n++;
-  if(!test.check("icrs().equals('ICRS')", icrs.equals(Equinox::from_string("ICRS").value(), Interval(Unit::s)))) n++;
-  if(!test.check("icrs() == 'ICRS'", (icrs == Equinox::from_string("ICRS").value()))) n++;
-  if(!test.check("icrs() == 'BCRS'", (icrs == Equinox::from_string("BCRS").value()))) n++;
-  if(!test.check("icrs() == 'GCRS'", (icrs == Equinox::from_string("GCRS").value()))) n++;
-  if(!test.check("icrs() == 'HCRS'", (icrs == Equinox::from_string("HCRS").value()))) n++;
-  if(!test.check("icrs() == 'FK6'", (icrs == Equinox::from_string("FK6").value()))) n++;
+  if(!test.check("icrs().equals('ICRS')", icrs.equals(Equinox::from_string("ICRS"), Interval(Unit::s)))) n++;
+  if(!test.check("icrs() == 'ICRS'", (icrs == Equinox::from_string("ICRS")))) n++;
+  if(!test.check("icrs() == 'BCRS'", (icrs == Equinox::from_string("BCRS")))) n++;
+  if(!test.check("icrs() == 'GCRS'", (icrs == Equinox::from_string("GCRS")))) n++;
+  if(!test.check("icrs() == 'HCRS'", (icrs == Equinox::from_string("HCRS")))) n++;
+  if(!test.check("icrs() == 'FK6'", (icrs == Equinox::from_string("FK6")))) n++;
   if(!test.check("icrs() == ICRS", (icrs == Equinox::from_system_type(NOVAS_ICRS), NAN))) n++;
   if(!test.check("icrs() == GCRS", (icrs == Equinox::from_system_type(NOVAS_GCRS), NAN))) n++;
 
@@ -62,10 +62,10 @@ int main() {
   if(!test.equals("j2000().to_string()", j2000.to_string(), NOVAS_SYSTEM_J2000)) n++;
   if(!test.check("j2000().equals(mod::j2000)", j2000.equals(Equinox::mod(NOVAS_JD_J2000)))) n++;
   if(!test.check("j2000().equals(mod::Time(j2000))", j2000.equals(Equinox::mod(Time::j2000())))) n++;
-  if(!test.check("j2000().equals('J2000')", j2000.equals(Equinox::from_string("J2000").value()))) n++;
-  if(!test.check("j2000().equals('j2000.00')", j2000.equals(Equinox::from_string("j2000.00").value()))) n++;
-  if(!test.check("j2000() == 'J2000'", (j2000 == Equinox::from_string("J2000").value()))) n++;
-  if(!test.check("j2000() == 'FK5'", (j2000 == Equinox::from_string("FK5").value()))) n++;
+  if(!test.check("j2000().equals('J2000')", j2000.equals(Equinox::from_string("J2000")))) n++;
+  if(!test.check("j2000().equals('j2000.00')", j2000.equals(Equinox::from_string("j2000.00")))) n++;
+  if(!test.check("j2000() == 'J2000'", (j2000 == Equinox::from_string("J2000")))) n++;
+  if(!test.check("j2000() == 'FK5'", (j2000 == Equinox::from_string("FK5")))) n++;
   if(!test.check("j2000() == J2000", (j2000 == Equinox::from_system_type(NOVAS_J2000), NAN))) n++;
   if(!test.check("j2000() != icrs", (j2000 != icrs))) n++;
 
@@ -77,11 +77,11 @@ int main() {
   if(!test.equals("1950().to_string()", b1950.to_string(), NOVAS_SYSTEM_B1950)) n++;
   if(!test.check("b1950().equals(mod::b1950)", b1950.equals(Equinox::mod(NOVAS_JD_B1950)))) n++;
   if(!test.check("b1950().equals(mod::Time(b1950))", b1950.equals(Equinox::mod(Time::b1950())))) n++;
-  if(!test.check("b1950().equals('B1950')", b1950.equals(Equinox::from_string("B1950").value()))) n++;
-  if(!test.check("b1950().equals('b1950.00')", b1950.equals(Equinox::from_string("b1950.00").value()))) n++;
-  if(!test.check("b1950() == 'B1950'", (b1950 == Equinox::from_string("B1950").value()))) n++;
-  if(!test.check("b1950() == 'MOD B1950'", (b1950 == Equinox::from_string("MOD B1950").value()))) n++;
-  if(!test.check("b1950() == 'FK4'", (b1950 == Equinox::from_string("FK4").value()))) n++;
+  if(!test.check("b1950().equals('B1950')", b1950.equals(Equinox::from_string("B1950")))) n++;
+  if(!test.check("b1950().equals('b1950.00')", b1950.equals(Equinox::from_string("b1950.00")))) n++;
+  if(!test.check("b1950() == 'B1950'", (b1950 == Equinox::from_string("B1950")))) n++;
+  if(!test.check("b1950() == 'MOD B1950'", (b1950 == Equinox::from_string("MOD B1950")))) n++;
+  if(!test.check("b1950() == 'FK4'", (b1950 == Equinox::from_string("FK4")))) n++;
   if(!test.check("b1950() != icrs", (b1950 != icrs))) n++;
 
 
@@ -99,8 +99,8 @@ int main() {
   if(!test.equals("tod(j2000).jd()", tod_j2000.jd(), NOVAS_JD_J2000)) n++;
   if(!test.equals("tod(j2000).to_string()", tod_j2000.to_string(), "TOD " NOVAS_SYSTEM_J2000)) n++;
   if(!test.check("tod(j2000) == 'tod(Time::j2000)", (tod_j2000 == Equinox::tod(Time::j2000())))) n++;
-  if(!test.check("tod(j2000) == 'TOD J2000'", (tod_j2000 == Equinox::from_string("TOD J2000").value()))) n++;
-  if(!test.check("tod(j2000) != 'J2000'", (tod_j2000 != Equinox::from_string("J2000").value()))) n++;
+  if(!test.check("tod(j2000) == 'TOD J2000'", (tod_j2000 == Equinox::from_string("TOD J2000")))) n++;
+  if(!test.check("tod(j2000) != 'J2000'", (tod_j2000 != Equinox::from_string("J2000")))) n++;
   if(!test.check("tod(j2000) != J2000", (tod_j2000 != j2000))) n++;
 
   Equinox cirs_j2000 = Equinox::cirs(NOVAS_JD_J2000);
@@ -110,8 +110,8 @@ int main() {
   if(!test.equals("cirs(j2000).jd()", cirs_j2000.jd(), NOVAS_JD_J2000)) n++;
   if(!test.equals("cirs(j2000).to_string()", cirs_j2000.to_string(), "CIRS " NOVAS_SYSTEM_J2000)) n++;
   if(!test.check("cirs(j2000) == 'cirs(Time::j2000)", (cirs_j2000 == Equinox::cirs(Time::j2000())))) n++;
-  if(!test.check("cirs(j2000) == 'CIRS J2000'", (cirs_j2000 == Equinox::from_string("CIRS J2000").value()))) n++;
-  if(!test.check("cirs(j2000) != 'J2000'", (cirs_j2000 != Equinox::from_string("J2000").value()))) n++;
+  if(!test.check("cirs(j2000) == 'CIRS J2000'", (cirs_j2000 == Equinox::from_string("CIRS J2000")))) n++;
+  if(!test.check("cirs(j2000) != 'J2000'", (cirs_j2000 != Equinox::from_string("J2000")))) n++;
   if(!test.check("cirs(j2000) != J2000", (cirs_j2000 != j2000))) n++;
 
   Equinox hip = Equinox::hip();

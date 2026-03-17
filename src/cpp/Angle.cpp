@@ -228,7 +228,7 @@ std::string Angle::to_string(enum novas_separator_type separator, int decimals) 
  *
  * @return    a reference to a static standard invalid angle.
  */
-Angle& Angle::undefined() {
+const Angle& Angle::undefined() {
   static Angle _invalid = Angle();
   return _invalid;
 }

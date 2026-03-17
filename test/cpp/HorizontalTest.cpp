@@ -49,26 +49,26 @@ int main() {
   if(!test.check("to_refracted(NULL)", a.to_refracted(NULL) == a)) n++;
   if(!test.check("to_unrefracted(NULL)", a.to_unrefracted(NULL) == a)) n++;
 
-  std::optional<Apparent> opt = a.to_apparent(Observer::at_geocenter().reduced_accuracy_frame_at(Time::j2000()),
+  Apparent opt = a.to_apparent(Observer::at_geocenter().reduced_accuracy_frame_at(Time::j2000()),
           ScalarVelocity(Unit::km / Unit::s), Coordinate(Unit::pc));
-  if(!test.check("to_apparent(geocentric)", !opt.has_value())) n++;
+  if(!test.check("to_apparent(geocentric)", !opt.is_valid())) n++;
 
   opt = a.to_apparent(Frame::undefined(), ScalarVelocity(Unit::km / Unit::s), Coordinate(Unit::pc));
-  if(!test.check("to_apparent(Frame invalid).has_value()", !opt.has_value())) n++;
+  if(!test.check("to_apparent(Frame invalid).is_valid()", !opt.is_valid())) n++;
 
   EOP eop(32, 0.1, 0.2 * Unit::arcsec, 0.3 * Unit::arcsec);
   Frame frame = Observer::on_earth(site, eop).reduced_accuracy_frame_at(Time::j2000());
 
   opt = a.to_apparent(frame, ScalarVelocity(Unit::km / Unit::s), Coordinate(Unit::pc));
-  if(!test.check("to_apparent().has_value()", opt.has_value())) n++;
+  if(!test.check("to_apparent().is_valid()", opt.is_valid())) n++;
 
   sky_pos p = {};
-  Apparent tod = opt.value();
+  Apparent tod = opt;
   novas_hor_to_app(frame._novas_frame(), a.azimuth().deg(), a.elevation().deg(), NULL, NOVAS_TOD, &p.ra, &p.dec);
   if(!test.equals("to_apparent() R.A.", tod.equatorial().ra().hours(), p.ra, 1e-10)) n++;
   if(!test.equals("to_apparent() Dec", tod.equatorial().dec().deg(), p.dec, 1e-9)) n++;
 
-  GeodeticFrame gf = Observer::on_earth(site, eop).reduced_accuracy_frame_at(Time::j2000());
+  Frame gf = Observer::on_earth(site, eop).reduced_accuracy_frame_at(Time::j2000());
   tod = a.to_apparent(gf, ScalarVelocity(Unit::km / Unit::s), Coordinate(Unit::pc));
   if(!test.check("to_apparent(geodetic)", tod.is_valid())) n++;
   if(!test.equals("to_apparent(geodetic) R.A.", tod.equatorial().ra().hours(), p.ra, 1e-10)) n++;

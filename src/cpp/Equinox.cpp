@@ -291,18 +291,18 @@ std::string Equinox::to_string() const {
  *                  'B1950', whereas for later dates Julian epochs are assumed, e.g. '2000'
  *                  &rarr; 'J2000'.
  * @return          an optional containing the corresponding valid equatorial system, or else
- *                  `std::nullopt`.
+ *                  Equinox::undefined().
  *
  * @sa is_valid(), icrs(), j2000(), b1950(), b1900()
  */
-std::optional<Equinox> Equinox::from_string(const std::string& name) {
+Equinox Equinox::from_string(const std::string& name) {
   const char *s = name.c_str();
   enum novas_reference_system sys = NOVAS_MOD;
   double ejd;
 
   if(name.length() < 3) {
     novas_set_errno(EINVAL, "Equinox::from_string()", "No catalog system matching: '%s'", name.c_str());
-    return std::nullopt;
+    return Equinox::undefined();
   }
 
   if(strcasecmp(&s[1], "CRS") == 0)
@@ -335,7 +335,7 @@ std::optional<Equinox> Equinox::from_string(const std::string& name) {
 
   if(isnan(ejd)) {
     novas_set_errno(EINVAL, "Equinox::from_string()", "No catalog system matching: '%s'", name.c_str());
-    return std::nullopt;
+    return Equinox::undefined();
   }
 
   if(sys == NOVAS_MOD && fabs(ejd - NOVAS_JD_J2000) * Unit::day < Unit::s)

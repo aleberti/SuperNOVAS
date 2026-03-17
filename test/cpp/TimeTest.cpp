@@ -76,7 +76,7 @@ int main() {
   struct timespec tu = {}, tu1 = {};
   tu.tv_sec = novas_get_unix_time(a._novas_timespec(), &tu.tv_nsec);
   tu1.tv_sec = a.unix_time(&tu1.tv_nsec);
-  if(!test.equals("unix_time() seconds", tu1.tv_sec, tu.tv_sec)) n++;
+  if(!test.equals("unix_time() seconds", (long) tu1.tv_sec, (long) tu.tv_sec)) n++;
   if(!test.equals("unix_time() nanos", tu1.tv_nsec, tu.tv_nsec)) n++;
 
   Time a3(&tu, eop);

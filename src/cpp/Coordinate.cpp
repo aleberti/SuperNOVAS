@@ -234,4 +234,14 @@ const Coordinate& Coordinate::at_Gpc() {
   return _at_Gpc;
 }
 
+/**
+ * Returns a reference to a static instance of an undefined / invalid coordinate.
+ *
+ * @return    a reference to a standard instance of an undefined coordinate.
+ */
+const Coordinate& Coordinate::undefined() {
+  static const Coordinate _undefined = Coordinate();
+  return _undefined;
+}
+
 } // namespace supernovas

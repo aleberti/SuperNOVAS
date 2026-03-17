@@ -88,9 +88,9 @@ Apparent Source::apparent_in(const Frame& frame) const {
   sky_pos pos = {};
 
   if(novas_sky_pos(&_object, frame._novas_frame(), NOVAS_TOD, &pos) == 0) {
-    std::optional<Apparent> opt = Apparent::from_tod_sky_pos(pos, frame);
-    if(opt.has_value())
-      return opt.value();
+    Apparent app = Apparent::from_tod_sky_pos(pos, frame);
+    if(app)
+      return app;
   }
 
   novas_trace_invalid("Source::apparent");
@@ -172,12 +172,12 @@ static const EOP& extract_eop(const Frame &frame) {
  * @return          the next time the source rises above the specified elevation after the frame's
  *                  observing time. It may be NAN if the source does not cross (rises above or
  *                  sets below) the elevation threshold within a day of the specified time of
- *                  observation. For observers non near Earth's surface, `std::nullopt` will be
- *                  returned.
+ *                  observation. For observers non near Earth's surface, `Time::undefined()` will
+ *                  be returned.
  *
  * @sa sets_below(), transits()
  */
-std::optional<Time> Source::rises_above(const Angle& el, const Frame &frame, novas::RefractionModel ref, const Weather& weather) const {
+Time Source::rises_above(const Angle& el, const Frame &frame, novas::RefractionModel ref, const Weather& weather) const {
   static const char *fn = "Source::rises_above()";
 
   if(frame.observer().is_geodetic()) {
@@ -193,7 +193,7 @@ std::optional<Time> Source::rises_above(const Angle& el, const Frame &frame, nov
   }
 
   novas_set_errno(ENOSYS, fn, "Cannot calculate rise time for a non-geodetic observer.");
-  return std::nullopt;
+  return Time::undefined();
 }
 
 /**
@@ -202,11 +202,11 @@ std::optional<Time> Source::rises_above(const Angle& el, const Frame &frame, nov
  *
  * @param frame     observing frame (observer location and the lower bound for the returned time).
  * @return          the next time the source transits after the frame's observing time, or else
- *                  `std::nullopt` if the observer is not near Earth's surface .
+ *                  `Time::undefined()` if the observer is not near Earth's surface .
  *
  * @sa sets_below(), transits()
  */
-std::optional<Time> Source::transits(const Frame &frame) const {
+Time Source::transits(const Frame &frame) const {
   static const char *fn = "Source::transits()";
 
   if(frame.observer().is_geodetic())
@@ -215,7 +215,7 @@ std::optional<Time> Source::transits(const Frame &frame) const {
           extract_eop(frame));
 
   novas_set_errno(ENOSYS, fn, "Cannot calculate transit time for a non-geodetic observer.");
-  return std::nullopt;
+  return Time::undefined();
 }
 
 /**
@@ -231,12 +231,12 @@ std::optional<Time> Source::transits(const Frame &frame) const {
  * @return          the next time the source sets the specified elevation after the frame's
  *                  observing time. It may be NAN if the source does not cross (rises above or
  *                  sets below) the elevation threshold within a day of the specified time of
- *                  observation. For observers not near Earth's surface, `std::nullopt` will be
- *                  returned.
+ *                  observation. For observers not near Earth's surface, `Time::undefined()` will
+ *                  be returned.
  *
  * @sa rises_above(), transits()
  */
-std::optional<Time> Source::sets_below(const Angle& el, const Frame &frame, novas::RefractionModel ref, const Weather& weather) const {
+Time Source::sets_below(const Angle& el, const Frame &frame, novas::RefractionModel ref, const Weather& weather) const {
   static const char *fn = "Source::sets_below()";
 
   if(frame.observer().is_geodetic()) {
@@ -253,71 +253,9 @@ std::optional<Time> Source::sets_below(const Angle& el, const Frame &frame, nova
   }
 
   novas_set_errno(ENOSYS, fn, "Cannot calculate setting time for a non-geodetic observer.");
-  return std::nullopt;
+  return Time::undefined();
 }
 
-/**
- * Returns the time when the source rises above the specified elevation next for an located on or
- * near Earth's surface. The returned value may also be NAN if the source does not cross the
- * specified elevation theshold within a day of the specified time of observation, or if any
- * of the parameters are invalid.
- *
- * @param el        elevation threshold angle
- * @param frame     observing frame (observer location and the lower bound for the returned time).
- * @param ref       atmospheric refraction model to assume
- * @param weather   local weather parameters for the refraction calculation
- * @return          the next time the source rises above the specified elevation after the frame's
- *                  observing time. It may be NAN if the source does not cross (rises above or
- *                  sets below) the elevation threshold within a day of the specified time of
- *                  observation.
- *
- * @sa sets_below(), transits()
- */
-Time Source::rises_above(const Angle& el, const GeodeticFrame &frame, novas::RefractionModel ref, const Weather& weather) const {
-  std::optional<Time> opt = rises_above(el, static_cast<Frame>(frame), ref, weather);
-  if(!opt.value().is_valid())
-    novas_trace_invalid("Source::rises_above()");
-  return opt.value();
-}
-
-/**
- * Returns the time when the source transits for an observer located on or near Earth's surface.
- *
- * @param frame     observing frame (observer location and the lower bound for the returned time).
- * @return          the next time the source transits after the frame's observing time.
- *
- * @sa sets_below(), transits()
- */
-Time Source::transits(const GeodeticFrame &frame) const {
-  std::optional<Time> opt = transits(static_cast<Frame>(frame));
-  if(!opt.value().is_valid())
-    novas_trace_invalid("Source::transits()");
-  return opt.value();
-}
-
-/**
- * Returns the time when the source sets below the specified elevation next for an observer
- * located on or near Earth's surface. The returned value may also be NAN if the source does not
- * cross the specified elevation theshold within a day of the specified time of observation,
- * or if any of the parameters are invalid.
- *
- * @param el        elevation threshold angle
- * @param frame     observing frame (observer location and the lower bound for the returned time).
- * @param ref       atmospheric refraction model to assume
- * @param weather   local weather parameters for the refraction calculation
- * @return          the next time the source sets the specified elevation after the frame's
- *                  observing time. It may be NAN if the source does not cross (rises above or
- *                  sets below) the elevation threshold within a day of the specified time of
- *                  observation.
- *
- * @sa rises_above(), transits()
- */
-Time Source::sets_below(const Angle& el, const GeodeticFrame &frame, novas::RefractionModel ref, const Weather& weather) const {
-  std::optional<Time> opt = sets_below(el, static_cast<Frame>(frame), ref, weather);
-  if(!opt.value().is_valid())
-    novas_trace_invalid("Source::sets_below()");
-  return opt.value();
-}
 
 /**
  * Returns the short-term equatorial trajectory of this source on the observer's sky, which can be used for
@@ -333,14 +271,18 @@ Time Source::sets_below(const Angle& el, const GeodeticFrame &frame, novas::Refr
  * @param range_seconds   [s] time range for which to fit a quadratic time evolution to the R.A., Dec,
  *                        distance, and radial velocity coordinates.
  * @return                a new near-term equatorial trajectory for this source, for the observing
- *                        location, around the time of observation, if possible, or else `std::nullopt`.
+ *                        location, around the time of observation, if possible, or else
+ *                        `EquatorialTrack::undefined()`.
  *
  * @sa horizontal_track()
  */
-std::optional<EquatorialTrack> Source::equatorial_track(const Frame &frame, double range_seconds) const {
+EquatorialTrack Source::equatorial_track(const Frame &frame, double range_seconds) const {
   novas_track track = {};
   novas_equ_track(_novas_object(), frame._novas_frame(), range_seconds, &track);
-  return EquatorialTrack::from_novas_track(Equinox::tod(frame.time().jd()), &track, Interval(range_seconds));
+  EquatorialTrack et = EquatorialTrack::from_novas_track(Equinox::tod(frame.time().jd()), &track, Interval(range_seconds));
+  if(!et.is_valid())
+    novas_trace_invalid("Source::equatorial_track()");
+  return et;
 }
 
 /**
@@ -357,11 +299,12 @@ std::optional<EquatorialTrack> Source::equatorial_track(const Frame &frame, doub
  * @param range           time range for which to fit a quadratic time evolution to the R.A., Dec,
  *                        distance, and radial velocity coordinates.
  * @return                a new near-term equatorial trajectory for this source, for the observing
- *                        location, around the time of observation, if possible, or else `std::nullopt`.
+ *                        location, around the time of observation, if possible, or else
+ *                        `EquatorialTrack::undefined()`.
  *
  * @sa horizontal_track()
  */
-std::optional<EquatorialTrack> Source::equatorial_track(const Frame &frame, const Interval& range) const {
+EquatorialTrack Source::equatorial_track(const Frame &frame, const Interval& range) const {
   return equatorial_track(frame, range.seconds());
 }
 
@@ -381,14 +324,17 @@ std::optional<EquatorialTrack> Source::equatorial_track(const Frame &frame, cons
  * @param ref             atmospheric refraction model to use for refraction correction.
  * @param weather         local weather parameters for the refraction calculation.
  * @return                a new near-term horizontal trajectory for this source, for the observing
- *                        location, around the time of observation, if possible, or else `std::nullopt`.
+ *                        location, around the time of observation, if possible, or else
+ *                        `HorizontalTrack::undefined()`.
  *
  * @sa equatorial_track()
  */
-std::optional<HorizontalTrack> Source::horizontal_track(const Frame &frame, novas::RefractionModel ref, const Weather& weather) const {
+HorizontalTrack Source::horizontal_track(const Frame &frame, novas::RefractionModel ref, const Weather& weather) const {
+  static const char *fn = "Source::horizontal_track()";
+
   if(!frame.observer().is_geodetic()) {
-    novas_set_errno(EINVAL, "Source::horizontal_track()", "input frame is not a geodetic observing frame");
-    return std::nullopt;
+    novas_set_errno(EINVAL, fn, "input frame is not a geodetic observing frame");
+    return HorizontalTrack::undefined();
   }
 
   novas_frame f = *frame._novas_frame();
@@ -401,7 +347,10 @@ std::optional<HorizontalTrack> Source::horizontal_track(const Frame &frame, nova
   novas_track track = {};
   novas_hor_track(_novas_object(), frame._novas_frame(), ref, &track);
 
-  return HorizontalTrack::from_novas_track(&track, Interval(1.0 * Unit::min));
+  HorizontalTrack ht = HorizontalTrack::from_novas_track(&track, Interval(1.0 * Unit::min));
+  if(!ht.is_valid())
+    novas_trace_invalid(fn);
+  return ht;
 }
 
 /**
@@ -576,6 +525,15 @@ double SolarSystemSource::solar_power(const Time& time) const {
 }
 
 /**
+ * Instantiates an undefined / invalid planet.
+ *
+ */
+Planet::Planet() : SolarSystemSource() {
+  _object.type = NOVAS_PLANET;
+  _object.number = (enum novas_planet) -1;
+}
+
+/**
  * Instantiates a planet from its NOVAS ID number.
  *
  * @param number    the NOVAS ID number
@@ -601,42 +559,60 @@ const Source *Planet::copy() const {
 }
 
 /**
- * Returns a new planet corresponding to the specified NAIF ID, if possible, or else `std::nullopt`
- * if the NAIF id does not belong to a major planet in the SuperNOVAS definition (which includes
- * the Sun, Moon, SSB, EMB, and Pluto system barycenter also).
+ * Returns a new planet corresponding to the specified NAIF ID, if possible, or else an invalid
+ * Planet if the NAIF id does not belong to a major planet in the SuperNOVAS definition (which
+ * includes the Sun, Moon, SSB, EMB, and Pluto system barycenter also). As such, you should
+ * typically check the result, e.g. as:
+ *
+ * ```c++
+ *   Planet p = Planet::for_naif_id(num);
+ *   if(!p) {
+ *     // Ooops there is no planet for that NAIF ID...
+ *     return;
+ *   }
+ * ```
  *
  * @param naif    the NAIF ID number of the planet
- * @return        the corresponding planet, or `std::nullopt` if the ID does not specify a planet
+ * @return        the corresponding planet, or an invalid planet if the ID does not specify a planet
  *                type body.
  *
  * @sa for_name(), naif_id()
  */
-std::optional<Planet> Planet::for_naif_id(long naif) {
+Planet Planet::for_naif_id(long naif) {
   enum novas_planet num = naif_to_novas_planet(naif);
   if((unsigned) num >= NOVAS_PLANETS) {
     novas_set_errno(EINVAL, "Planet::for_naif_id()", "no planet with NAIF %d", naif);
-    return std::nullopt;
+    return Planet();
   }
   return Planet(num);
 }
 
 /**
  * Returns a new planet corresponding to the specified name (case insensitive), if possible, or
- * else `std::nullopt` if the name does not correspond to a major planet in the SuperNOVAS
- * definition (which includes the Sun, Moon, SSB, EMB, and Pluto system barycenter also).
+ * else an invalid Planet if the name does not correspond to a major planet in the SuperNOVAS
+ * definition (which includes the Sun, Moon, SSB, EMB, and Pluto system barycenter also). As such,
+ * you should typically check the result, e.g. as:
+ *
+ * ```c++
+ *   Planet p = Planet::for_name(some_name);
+ *   if(!p) {
+ *     // Ooops there is no planet for that name...
+ *     return;
+ *   }
+ * ```
  *
  * @param name    the planet's name (includes Sun, Moon, SSB, EMB, and Pluto-Barycenter also).
  *                Case insensitive.
- * @return        the corresponding planet, or `std::nullopt` if the ID does not specify a planet
- *                type body.
+ * @return        the corresponding planet, or an invalid planet if the ID does not specify a
+ *                planet type body.
  *
  * @sa for_naif_id()
  */
-std::optional<Planet> Planet::for_name(const std::string& name) {
+Planet Planet::for_name(const std::string& name) {
   enum novas_planet num = novas_planet_for_name(name.c_str());
   if((unsigned) num >= NOVAS_PLANETS) {
     novas_set_errno(EINVAL, "Planet::for_name()", "no planet with name '%s'", name.c_str());
-    return std::nullopt;
+    return Planet();
   }
   return Planet(num);
 }

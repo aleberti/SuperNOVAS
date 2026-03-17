@@ -20,7 +20,7 @@ int main() {
   Apparent x = Apparent::undefined();
   if(!test.check("invalid", !x.is_valid())) n++;
   if(!test.check("invalid frame", !x.frame().is_valid())) n++;
-  if(!test.check("invalid to_horizontal()", !x.to_horizontal().has_value())) n++;
+  if(!test.check("invalid to_horizontal()", !x.to_horizontal().is_valid())) n++;
 
   sky_pos p = {};
   p.ra = 3.0;
@@ -50,7 +50,7 @@ int main() {
   if(!test.equals("distance()", tod.distance().au(), p.dis, 1e-12)) n++;
   if(!test.check("ecliptic()", tod.ecliptic() == tod.equatorial().to_ecliptic())) n++;
   if(!test.check("galactic()", tod.galactic() == tod.equatorial().to_galactic())) n++;
-  if(!test.check("horizontal(gc)", !tod.to_horizontal().has_value())) n++;
+  if(!test.check("horizontal(gc)", !tod.to_horizontal().is_valid())) n++;
   if(!test.equals("to_string()", tod.to_string(), "Apparent EQU 03h 00m 00.0000s   -15d 00m 00.000s  TOD J2000 in Frame for Geocentric Observer at 2000-01-01T11:58:55.816 UTC")) n++;
 
   double ra_cirs = app_to_cirs_ra(frame.time().jd(), NOVAS_REDUCED_ACCURACY, p.ra);
@@ -91,11 +91,11 @@ int main() {
 
   double az = 0.0, el = 0.0;
   novas_app_to_hor(frame._novas_frame(), NOVAS_TOD, p.ra, p.dec, NULL, &az, &el);
-  std::optional<Horizontal> opt = Apparent::from_tod_sky_pos(p, frame).to_horizontal();
+  Horizontal opt = Apparent::from_tod_sky_pos(p, frame).to_horizontal();
 
-  if(!test.check("to_horizontal(site)", opt.has_value())) n++;
-  if(!test.equals("to_horizontal() az", opt.value().azimuth().deg(), az, 1e-13)) n++;
-  if(!test.equals("to_horizontal() el", opt.value().elevation().deg(), el, 1e-13)) n++;
+  if(!test.check("to_horizontal(site)", opt.is_valid())) n++;
+  if(!test.equals("to_horizontal() az", opt.azimuth().deg(), az, 1e-13)) n++;
+  if(!test.equals("to_horizontal() el", opt.elevation().deg(), el, 1e-13)) n++;
 
 
   std::cout << "Apparent.cpp: " << (n > 0 ? "FAILED" : "OK") << "\n";

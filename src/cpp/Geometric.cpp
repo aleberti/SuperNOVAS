@@ -191,8 +191,12 @@ Geometric Geometric::to_system(enum novas_reference_system system) const {
   if(system == _system)
     return *this;
 
-  if(system == NOVAS_ITRS)
-    return to_itrs().value_or(Geometric::undefined()); // TODO error trace...
+  if(system == NOVAS_ITRS) {
+    Geometric itrs = to_itrs();
+    if(!itrs.is_valid())
+      novas_trace_invalid("Geometric::to_system()");
+    return itrs;
+  }
 
   return to_system(_frame._novas_frame(), system);
 }
@@ -280,16 +284,28 @@ Geometric Geometric::to_tirs() const {
 /**
  * Returns new geometric coordinates that are transformed from these into the rotating
  * International Terrestrial Reference System (ITRS), with respect to the true dynamical equator
- * and the Greenwich meridian.
+ * and the Greenwich meridian.  The returned instance may be invalid if an invalid EOP was
+ * supplied and the observer also does not define its own valid EOP. It's best practice to
+ * check on the validity of the returned value, e.g. as:
+ *
+ * ```c++
+ *  Geometric g = ...;
+ *  Geometric itrs = g.to_itrs(eop);
+ *  if(!itrs) {
+ *    // Oops, there was no valid EOP to calculate true ITRS values.
+ *    return;
+ *  }
+ * ```
  *
  * @param eop       Earth Orientation Parameters (EOP) appropriate for the date, such as obtained
  *                  from the IERS bulletins or web service.
  * @return          geometric coordinates for the same position and velocity as this, but
- *                  expressed in the ITRS.
+ *                  expressed in the ITRS. The returned instance may be invalid if an invalid EOP
+ *                  was supplied and the observer also does not define its own valid EOP.
  *
  * @sa to_system(), to_icrs(), to_j2000(), to_mod(), to_tod(), to_cirs(), to_tirs()
  */
-std::optional<Geometric> Geometric::to_itrs(const EOP& eop) const {
+Geometric Geometric::to_itrs(const EOP& eop) const {
   if(_system == NOVAS_ITRS)
     return Geometric(*this);
 
@@ -318,7 +334,7 @@ std::optional<Geometric> Geometric::to_itrs(const EOP& eop) const {
 
   // Or, we can't really convert to ITRS
   novas_set_errno(EINVAL, "Geometric::to_itrs()", "Needs valid EOP for non geodetic observer frame");
-  return std::nullopt;
+  return Geometric::undefined();
 }
 
 /**

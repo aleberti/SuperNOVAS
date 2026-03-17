@@ -65,7 +65,7 @@ The primary goal of __SuperNOVAS__ is to improve on the original NOVAS C library
 
  - Fixing [outstanding issues](#fixed-issues).
  - Improved [C99 API documentation](https://sigmyne.github.io/SuperNOVAS/doc/html/files.html).
- - Optional, higher-level, [C++17 API](USAGE-CPP.md) (since v1.6).
+ - Optional, higher-level, [C++11 API](USAGE-CPP.md) (since v1.6).
  - [Faster calculations](#benchmarks).
  - [New features](#added-functionality).
  - [Refined C99 API](#api-changes) to promote best programming practices.
@@ -220,7 +220,7 @@ local documentation, and tests, etc.) on POSIX systems such as Linux, Mac OS X, 
 Before compiling the library take a look a `config.mk` and edit it as necessary for your needs, or else define
 the necessary variables in the shell prior to invoking `make`. For example:
    
- - `ENABLE_CPP`: As of v1.6, __SuperNOVAS__ offers a C++17 API and library also, but it is not enabled by default. To
+ - `ENABLE_CPP`: As of v1.6, __SuperNOVAS__ offers a C++11 API and library also, but it is not enabled by default. To
    build C++ library (`libsupernovas++`), and install the C++ header (`supernovas.h`) and documentation you should
    set this option to 1, either in your environment or else in `config.mk`. 
  
@@ -336,7 +336,7 @@ The __SuperNOVAS__ CMake build supports the following options (in addition to th
  - `BUILD_EXAMPLES=ON|OFF` (default: ON) - Build the included examples
  - `BUILD_TESTING=ON|OFF` (default: ON - Build regression tests
  - `BUILD_BENCHMARK=ON|OFF` (default: OFF - Build benchmarking programs 
- - `ENABLE_CPP=ON|OFF` (default: OFF - Build C++17 library (`supernovas++`) also. 
+ - `ENABLE_CPP=ON|OFF` (default: OFF - Build C++11 library (`supernovas++`) also. 
  - `ENABLE_CALCEPH=ON|OFF` (default: OFF) - Optional CALCEPH ephemeris plugin support. Requires `calceph` package.
  - `ENABLE_CSPICE=ON|OFF` (default: OFF) - Optional CSPICE ephemeris plugin support. Requires `cspice` library 
    installed.
@@ -399,7 +399,7 @@ You can install the complete SuperNOVAS library with `vcpkg` as:
   $ vcpkg install supernovas
 ```
 
-Or, including the the C++17 API library and the `solsys-calceph` plugin library as:
+Or, including the the C++11 API library and the `solsys-calceph` plugin library as:
 
 ```bash
   $ vcpkg install supernovas[core,cpp,solsys-calceph]
@@ -430,7 +430,7 @@ And or Fedora / EPEL based distributions as:
   $ sudo dnf install supernovas supernovas-c++ supernovas-solsys-calceph supernovas-doc supernovas-devel
 ```
 
-In both cases the first package is the runtime library, the second is the C++17 API library, the third is the runtime 
+In both cases the first package is the runtime library, the second is the C++11 API library, the third is the runtime 
 library for the `solsys-calceph` plugin, the fourth is documentation, and the last one is the files needed for 
 application development.
 
@@ -447,7 +447,7 @@ application development.
 ### Homebrew package
 
 As of version 1.5, there is also a [Homebrew](https://brew.sh/) package through the maintainer's own Tap, which 
-includes the `solsys-calceph` plugin by default. And, as of the 1.6 release it includes the C++17 API library also.
+includes the `solsys-calceph` plugin by default. And, as of the 1.6 release it includes the C++11 API library also.
 
 <details>
 
@@ -544,22 +544,22 @@ them.
 <a name="integration"></a>
 ## Building your application with SuperNOVAS
 
-As of v1.6 __SuperNOVAS__ comes in two flavors, the original C99 API, and a higher-level C++17 API. Depending on which 
+As of v1.6 __SuperNOVAS__ comes in two flavors, the original C99 API, and a higher-level C++11 API. Depending on which 
 one you intend to use, choose the appropriate link to an external document below:
 
  - [Using the C99 API](USAGE-C99.md#integration-c99)
- - [Using the C++17 API](cpp/USAGE-CPP.md#integration-c++)
+ - [Using the C++11 API](cpp/USAGE-CPP.md#integration-c++)
 
 -----------------------------------------------------------------------------
 
 <a name="examples"></a>
 ## Example usage
 
-As of v1.6 __SuperNOVAS__ comes in two flavors, the original C99 API, and a higher-level C++17 API. Depending on which 
+As of v1.6 __SuperNOVAS__ comes in two flavors, the original C99 API, and a higher-level C++11 API. Depending on which 
 one you intend to use, choose the appropriate link to an external document below:
 
  - [Using the C99 API)](USAGE-C99.md#examples-c99)
- - [Using the C++17 API](cpp/USAGE-CPP.md#examples-c++)
+ - [Using the C++11 API](cpp/USAGE-CPP.md#examples-c++)
  
 
 -----------------------------------------------------------------------------
@@ -1123,7 +1123,7 @@ Below is a non-exhaustive overview new features added by __SuperNOVAS__ on top o
 <details open>
 <summary>New in v1.6</summary>
 
- - Introducing a new, high-level, C++17 API (`supernovas++`) on top of the standard C99 one.
+ - Introducing a new, high-level, C++11 API (`supernovas++`) on top of the standard C99 one.
  
  
 </details>

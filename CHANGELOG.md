@@ -15,7 +15,7 @@ Upcoming feature release.
 
 ### Added
 
- - #256: New C++17 API to wrap the C99 functions into a higher-level, easier to use, and object-oriented interface.
+ - #256: New C++11 API to wrap the C99 functions into a higher-level, easier to use, and object-oriented interface.
 
  - #256: New `novas_time_leap()` to simplify back calculating the leap seconds from a `novas_timespec` structure.
 

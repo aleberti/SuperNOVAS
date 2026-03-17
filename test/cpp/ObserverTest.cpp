@@ -61,8 +61,8 @@ int main() {
   if(!test.check("site()", g1.site() == site)) n++;
   if(!test.check("velocity()", g1.itrs_velocity() == Velocity::stationary())) n++;
   if(!test.check("site()", g1.eop() == eop)) n++;
-  if(!test.check("frame_at(reduced)", g1.frame_at(Time::j2000(), NOVAS_REDUCED_ACCURACY).has_value())) n++;
-  if(!test.check("frame_at(full)", !g1.frame_at(Time::j2000(), NOVAS_FULL_ACCURACY).has_value())) n++;
+  if(!test.check("frame_at(reduced)", g1.frame_at(Time::j2000(), NOVAS_REDUCED_ACCURACY).is_valid())) n++;
+  if(!test.check("frame_at(full)", !g1.frame_at(Time::j2000(), NOVAS_FULL_ACCURACY).is_valid())) n++;
   if(!test.equals("to_string(on_earth)", g1.to_string(),
           "GeodeticObserver at Site (W 114d 35m 29.612s, N  57d 17m 44.806s, altitude 75 m)")) n++;
 
@@ -100,8 +100,8 @@ int main() {
   if(!test.check("is_geodetic(gc)", !gc.is_geodetic())) n++;
   if(!test.check("geocentric_position(gc)", gc.geocentric_position() == Position::origin())) n++;
   if(!test.check("geocentric_velocity(gc)", gc.geocentric_velocity() == Velocity::stationary())) n++;
-  if(!test.check("frame_at(reduced)", gc.frame_at(Time::j2000(), NOVAS_REDUCED_ACCURACY).has_value())) n++;
-  if(!test.check("frame_at(full)", !gc.frame_at(Time::j2000(), NOVAS_FULL_ACCURACY).has_value())) n++;
+  if(!test.check("frame_at(reduced)", gc.frame_at(Time::j2000(), NOVAS_REDUCED_ACCURACY).is_valid())) n++;
+  if(!test.check("frame_at(full)", !gc.frame_at(Time::j2000(), NOVAS_FULL_ACCURACY).is_valid())) n++;
   if(!test.equals("to_string(gc)", gc.to_string(), "Geocentric Observer")) n++;
 
 
@@ -138,8 +138,8 @@ int main() {
   if(!test.equals("type(ssb)", ssb.type(), NOVAS_SOLAR_SYSTEM_OBSERVER)) n++;
   if(!test.check("is_geocentric(ssb)", !ssb.is_geocentric())) n++;
   if(!test.check("is_geodetic(ssb)", !ssb.is_geodetic())) n++;
-  if(!test.check("frame_at(reduced)", ssb.frame_at(Time::j2000(), NOVAS_REDUCED_ACCURACY).has_value())) n++;
-  if(!test.check("frame_at(full)", !ssb.frame_at(Time::j2000(), NOVAS_FULL_ACCURACY).has_value())) n++;
+  if(!test.check("frame_at(reduced)", ssb.frame_at(Time::j2000(), NOVAS_REDUCED_ACCURACY).is_valid())) n++;
+  if(!test.check("frame_at(full)", !ssb.frame_at(Time::j2000(), NOVAS_FULL_ACCURACY).is_valid())) n++;
   if(!test.equals("to_string(ssb)", ssb.to_string(), "SolarSystemObserver at SSB")) n++;
 
   o = ssb._novas_observer();

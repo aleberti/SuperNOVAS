@@ -12,16 +12,11 @@
 #include <cmath>
 #include <type_traits>
 
-
 #include "supernovas.h"
 
 using namespace novas;
 
 namespace supernovas {
-
-
-template class Track<Horizontal>;
-template class Track<Equatorial>;
 
 
 template<class CoordType> void Track<CoordType>::validate() {
@@ -41,6 +36,15 @@ template<class CoordType> void Track<CoordType>::validate() {
     novas_set_errno(EINVAL, fn, "radial evolution is invalid");
 
   _valid = (errno == 0);
+
+  if(!_z.is_valid() && _r.is_valid() && _range.is_valid()) {
+    double dt = fabs(_range.seconds());
+    double z0 = novas_v2z(_r.rate(Interval::zero()) / (Unit::km / Unit::s));
+    double zp = novas_v2z(_r.rate(Interval(dt)) / (Unit::km / Unit::s));
+    double zm = novas_v2z(_r.rate(Interval(-dt)) / (Unit::km / Unit::s));
+    double z1 = 0.5 * (zp - zm) / dt;
+    _z = ScalarEvolution(z0, z1);
+  }
 }
 
 /**
@@ -64,15 +68,6 @@ template<class CoordType> Track<CoordType>::Track(const Time& ref_time, const In
 
   // make sure CoordType is a sublcass of Spherical
   static_assert(std::is_base_of<Spherical, CoordType>::value, "Track: CoordType is not a subclass of Spherical");
-
-  if(!_z.is_valid()) {
-    double dt = fabs(range.seconds());
-    double z0 = novas_v2z(_r.rate(Interval::zero()) / (Unit::km / Unit::s));
-    double zp = novas_v2z(_r.rate(Interval(dt)) / (Unit::km / Unit::s));
-    double zm = novas_v2z(_r.rate(Interval(-dt)) / (Unit::km / Unit::s));
-    double z1 = 0.5 * (zp - zm) / dt;
-    _z = ScalarEvolution(z0, z1);
-  }
 
   validate();
 }
@@ -237,83 +232,133 @@ template<class CoordType> double Track<CoordType>::unchecked_redshift(const Time
 
 /**
  * Returns the momentary extrapolated longitude angle (if valid), or else `std::nullopt` if
- * the time is outside the range of validity.
+ * the time is outside the range of validity. It is best practice to check on its validity before
+ * use, e.g. as:
+ *
+ * ```c++
+ *   Angle a = track.longitude_at(...);
+ *   if(!a) {
+ *     // Oops, not valid
+ *     return;
+ *   }
+ * ```
  *
  * @param time      astrometric time for which we want the extrapolated value.
  * @return          the momentary extrapolated longitude angle (if valid), or else `std::nullopt`.
  *
  * @sa latitude_at(), distance_at(), radial_velocity_at(), redshift_at()
  */
-template<class CoordType> std::optional<Angle> Track<CoordType>::longitude_at(const Time& time) const {
+template<class CoordType> Angle Track<CoordType>::longitude_at(const Time& time) const {
   if(is_valid_at(time))
     return unchecked_longitude(time);
-  novas_set_errno(ERANGE, "Track::longitude_at()", "requested time is outside the trajectory valifity range");
-  return std::nullopt;
+  novas_set_errno(ERANGE, "Track::longitude_at()", "requested time is outside the trajectory validity range");
+  return Angle::undefined();
 }
 
 /**
  * Returns the momentary extrapolated latitude angle (if valid), or else `std::nullopt` if
- * the time is outside the range of validity.
+ * the time is outside the range of validity. It is best practice to check on its validity before
+ * use, e.g. as:
+ *
+ * ```c++
+ *   Angle a = track.latitude_at(...);
+ *   if(!a) {
+ *     // Oops, not valid
+ *     return;
+ *   }
+ * ```
  *
  * @param time      astrometric time for which we want the extrapolated value.
  * @return          the momentary extrapolated latitude angle (if valid), or else `std::nullopt`.
  *
  * @sa longitude_at(), distance_at(), radial_velocity_at(), redshift_at()
  */
-template<class CoordType> std::optional<Angle> Track<CoordType>::latitude_at(const Time& time) const {
+template<class CoordType> Angle Track<CoordType>::latitude_at(const Time& time) const {
   if(is_valid_at(time))
     return unchecked_latitude(time);
-  novas_set_errno(ERANGE, "Track::latitude_at()", "requested time is outside the trajectory valifity range");
-  return std::nullopt;
+  novas_set_errno(ERANGE, "Track::latitude_at()", "requested time is outside the trajectory validity range");
+  return Angle::undefined();
 }
 
 /**
  * Returns the momentary extrapolated redshift measure (if valid), or else NAN if
- * the time is outside the range of validity.
+ * the time is outside the range of validity. It is best practice to check on its validity
+ * before use, e.g. as:
+ *
+ * ```c++
+ *   double z = track.redshift_at(...);
+ *   if(!isfinite(z)) {
+ *     // Oops, not valid
+ *     return;
+ *   }
+ * ```
  *
  * @param time      astrometric time for which we want the extrapolated value.
  * @return          the momentary extrapolated redshift measure (if valid), or else NAN.
  *
  * @sa longitude_at(), latitude_at(), distance_at(), radial_velocity_at()
  */
-template<class CoordType> std::optional<double> Track<CoordType>::redshift_at(const Time& time) const {
+template<class CoordType> double Track<CoordType>::redshift_at(const Time& time) const {
   if(is_valid_at(time))
     return unchecked_redshift(time);
-  novas_set_errno(ERANGE, "Track::redshift_at()", "requested time is outside the trajectory valifity range");
-  return std::nullopt;
+  novas_set_errno(ERANGE, "Track::redshift_at()", "requested time is outside the trajectory validity range");
+  return nan("");
 }
 
 /**
  * Returns the momentary extrapolated distance (if valid), or else `std::nullopt` if
- * the time is outside the range of validity.
+ * the time is outside the range of validity. It is best practice to check on its validity before
+ * use, e.g. as:
+ *
+ * ```c++
+ *   Coordinate d = track.distance_at(...);
+ *   if(!d) {
+ *     // Oops, not valid
+ *     return;
+ *   }
+ * ```
  *
  * @param time      astrometric time for which we want the extrapolated value.
  * @return          the momentary extrapolated distance (if valid), or else `std::nullopt`.
  *
  * @sa longitude_at(), latitude_at(), radial_velocity_at(), redshift_at()
  */
-template<class CoordType> std::optional<Coordinate> Track<CoordType>::distance_at(const Time& time) const {
+template<class CoordType> Coordinate Track<CoordType>::distance_at(const Time& time) const {
   if(is_valid_at(time))
     return unchecked_distance(time);
-  novas_set_errno(ERANGE, "Track::distance_at()", "requested time is outside the trajectory valifity range");
-  return std::nullopt;
+  novas_set_errno(ERANGE, "Track::distance_at()", "requested time is outside the trajectory validity range");
+  return Coordinate::undefined();
 }
 
 /**
  * Returns the momentary extrapolated radial velocity (if valid), or else `std::nullopt` if
- * the time is outside the range of validity.
+ * the time is outside the range of validity. It is best practice to check on its validity before
+ * use, e.g. as:
+ *
+ * ```c++
+ *   ScalarVelocity rv = track.radial_velocity_at(...);
+ *   if(!rv) {
+ *     // Oops, not valid
+ *     return;
+ *   }
+ * ```
  *
  * @param time      astrometric time for which we want the extrapolated value.
  * @return          the momentary extrapolated radial velocity (if valid), or else `std::nullopt`.
  *
  * @sa longitude(), latitude(), distance(), redshift_at()
  */
-template<class CoordType> std::optional<ScalarVelocity> Track<CoordType>::radial_velocity_at(const Time& time) const {
+template<class CoordType> ScalarVelocity Track<CoordType>::radial_velocity_at(const Time& time) const {
   if(is_valid_at(time))
     return ScalarVelocity(novas_z2v(unchecked_redshift(time)) * (Unit::km / Unit::s));
-  novas_set_errno(ERANGE, "Track::radial_velocity_at()", "requested time is outside the trajectory valifity range");
-  return std::nullopt;
+  novas_set_errno(ERANGE, "Track::radial_velocity_at()", "requested time is outside the trajectory validity range");
+  return ScalarVelocity::undefined();
 }
+
+
+template class Track<Horizontal>;
+template class Track<Equatorial>;
+
 
 /**
  * Instantiates a short-term horizontal source trajectory on sky for a given time range of
@@ -345,12 +390,24 @@ HorizontalTrack::HorizontalTrack(const novas::novas_track *track, const Interval
  */
 HorizontalTrack::HorizontalTrack(const Time& ref_time, const Interval& range,
         const ScalarEvolution& azimuth, const ScalarEvolution& elevation, const ScalarEvolution& distance, const ScalarEvolution& z)
-: Track(ref_time, range, azimuth, elevation, distance, z) {}
+: Track(ref_time, range, azimuth, elevation, distance, z) {
+  if(!is_valid())
+      novas_trace_invalid("HorizontalTrack()");
+}
 
 
 /**
- * Returns the momentary extrapolated horizontal coordinates (if valid), or else `std::nullopt` if
- * the time is outside the range of validity.
+ * Returns the momentary extrapolated horizontal coordinates (if valid), or else
+ * Horizontal::undefined() if the time is outside the range of validity. It is best practice to
+ * check on its validity before use, e.g. as:
+ *
+ * ```c++
+ *   Horizontal hor = track.projected_at(...);
+ *   if(!hor) {
+ *     // Oops, not valid
+ *     return;
+ *   }
+ * ```
  *
  * @param time      astrometric time for which we want the extrapolated value.
  * @return          the momentary extrapolated horizontal coordinates (if valid), or else
@@ -358,17 +415,27 @@ HorizontalTrack::HorizontalTrack(const Time& ref_time, const Interval& range,
  *
  * @sa EquatorialTrack::projected_at()
  */
-std::optional<Horizontal> HorizontalTrack::projected_at(const Time& time) const {
+Horizontal HorizontalTrack::projected_at(const Time& time) const {
   if(is_valid_at(time))
     return Horizontal(unchecked_longitude(time), unchecked_latitude(time));
-  novas_set_errno(ERANGE, "HorizontalTrack::projected_at()", "requested time is outside the trajectory valifity range");
-  return std::nullopt;
+  novas_set_errno(ERANGE, "HorizontalTrack::projected_at()", "requested time is outside the trajectory validity range");
+  return Horizontal::undefined();
 }
 
 /**
  * Instantiates a short-term trajectory estimate for a source in horizontal coordinates, which can
  * be used to extrapolate the horizontal (Az/El) positions of the source around the specified
- * reference time inside an interval of validity.
+ * reference time inside an interval of validity. The returned track may be invalid if the input
+ * parameters are invalid. As such it is best practice to check on its validity before use, e.g.
+ * as:
+ *
+ * ```c++
+ *   HorizontalTrack tr = HorizontalTrack::from_novas_track(...);
+ *   if(!tr) {
+ *     // Oops, the track is not valid
+ *     return;
+ *   }
+ * ```
  *
  * @param track     Pointer to the C tajectory data structure
  * @param range     time range of validity around the reference time. Attempts to extrapolate
@@ -376,12 +443,12 @@ std::optional<Horizontal> HorizontalTrack::projected_at(const Time& time) const 
  *
  * @sa EquatorialTrack::from_novas_track()
  */
-std::optional<HorizontalTrack> HorizontalTrack::from_novas_track(const novas_track *track, const Interval& range) {
+HorizontalTrack HorizontalTrack::from_novas_track(const novas_track *track, const Interval& range) {
   static const char *fn = "HorizontalTrack::from_novas_track()";
 
   if(!track) {
     novas_set_errno(EINVAL, fn, "input track is NULL");
-    return std::nullopt;
+    return HorizontalTrack();
   }
 
   HorizontalTrack t(track, range);
@@ -390,12 +457,31 @@ std::optional<HorizontalTrack> HorizontalTrack::from_novas_track(const novas_tra
     return t;
 
   novas_trace_invalid(fn);
-  return std::nullopt;
+  return HorizontalTrack();
 }
 
 /**
- * Returns the momentary extrapolated equatorial coordinates (if valid), or else `std::nullopt` if
- * the time is outside the range of validity.
+ * Returns a reference to a static instance of a standard undefined horizontal track.
+ *
+ * @return    the reference to a standard undefined horizontal track.
+ */
+const HorizontalTrack& HorizontalTrack::undefined() {
+  static HorizontalTrack _undefined = HorizontalTrack();
+  return _undefined;
+}
+
+/**
+ * Returns the momentary extrapolated equatorial coordinates (if valid), or else
+ * Equatorial::undefined() if the time is outside the range of validity. It is best practice to
+ * check the valifity of the returned value before using it, e.g. as:
+ *
+ * ```c++
+ *   Equatorial eq = track.projected_at(...);
+ *   if(!eq) {
+ *     // Oops, we could not interpolate valid data
+ *     return;
+ *   }
+ * ```
  *
  * @param time      astrometric time for which we want the extrapolated value.
  * @return          the momentary extrapolated equatorial coordinates (if valid), or else
@@ -403,11 +489,11 @@ std::optional<HorizontalTrack> HorizontalTrack::from_novas_track(const novas_tra
  *
  * @sa HorizontalTrack::projected_at()
  */
-std::optional<Equatorial> EquatorialTrack::projected_at(const Time& time) const {
+Equatorial EquatorialTrack::projected_at(const Time& time) const {
   if(is_valid_at(time))
     return Equatorial(unchecked_longitude(time), unchecked_latitude(time), _system);
-  novas_set_errno(ERANGE, "EquatorialTrack::projected_at()", "requested time is outside the trajectory valifity range");
-  return std::nullopt;
+  novas_set_errno(ERANGE, "EquatorialTrack::projected_at()", "requested time is outside the trajectory validity range");
+  return Equatorial::undefined();
 }
 
 /**
@@ -432,7 +518,17 @@ EquatorialTrack::EquatorialTrack(const Equinox& system, const novas::novas_track
 
 /**
  * Instantiates a short-term equatorial source trajectory on sky for a given reference time,
- * time evolution, and time range of validity.
+ * time evolution, and time range of validity. The returned track may be invalid if the input
+ * parameters are invalid. As such it is best practice to check on its validity before use, e.g.
+ * as:
+ *
+ * ```c++
+ *   EquatorialTrack tr(...);
+ *   if(!tr) {
+ *     // Oops, the track is not valid
+ *     return;
+ *   }
+ * ```
  *
  * @param system      the equatorial coordinate system in which the trajectory is defined.
  * @param ref_time    astrometric reference time for which the data is defined.
@@ -448,13 +544,25 @@ EquatorialTrack::EquatorialTrack(const Equinox& system, const novas::novas_track
  */
 EquatorialTrack::EquatorialTrack(const Equinox& system, const Time& ref_time, const Interval& range,
         const ScalarEvolution& ra, const ScalarEvolution& dec, const ScalarEvolution& distance, const ScalarEvolution& z)
-: Track(ref_time, range, ra, dec, distance, z), _system(system) {}
+: Track(ref_time, range, ra, dec, distance, z), _system(system) {
+  if(!is_valid())
+      novas_trace_invalid("EquatorialTrack()");
+}
 
 
 /**
  * Instantiates a short-term trajectory estimate for a source in equatorial coordinates, which can be
  * used to extrapolate the equatorial (RA/Dec) positions of the source around the specified
- * reference time inside an interval of validity.
+ * reference time inside an interval of validity. The returned track may be invalid if the input
+ * parameters are invalid. As such it is best practice to check on its validity before use, e.g. as:
+ *
+ * ```c++
+ *   EquatorialTrack tr = EquatorialTrack::from_novas_track(...);
+ *   if(!tr) {
+ *     // Oops, the track is not valid
+ *     return;
+ *   }
+ * ```
  *
  * @param system    equatorial coordinate system
  * @param track     Pointer to the C tajectory data structure
@@ -463,12 +571,12 @@ EquatorialTrack::EquatorialTrack(const Equinox& system, const Time& ref_time, co
  *
  * @sa HorizontalTrack::from_novas_track()
  */
-std::optional<EquatorialTrack> EquatorialTrack::from_novas_track(const Equinox& system, const novas_track *track, const Interval& range) {
+EquatorialTrack EquatorialTrack::from_novas_track(const Equinox& system, const novas_track *track, const Interval& range) {
   static const char *fn = "EquatorialTrack::from_novas_track()";
 
   if(!track) {
     novas_set_errno(EINVAL, fn, "input track is NULL");
-    return std::nullopt;
+    return EquatorialTrack();
   }
 
   EquatorialTrack t(system, track, range);
@@ -477,7 +585,7 @@ std::optional<EquatorialTrack> EquatorialTrack::from_novas_track(const Equinox& 
     return t;
 
   novas_trace_invalid(fn);
-  return std::nullopt;
+  return EquatorialTrack();
 }
 
 

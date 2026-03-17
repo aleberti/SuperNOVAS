@@ -79,8 +79,8 @@ int main() {
 
   // ... Or you could set a time from a string calendar date
   /*
-  std::optional<CalendarDate> date = Calendar::gregorian().parse_date("2026-01-09 12:33:15.342+0200");
-  if(!date.has_value()) {
+  CalendarDate date = Calendar::gregorian().parse_date("2026-01-09 12:33:15.342+0200");
+  if(!date) {
     std::cerr << "ERROR! could not parse date string.\n";
     return 1;
   }
@@ -127,13 +127,11 @@ int main() {
   // (6 C deg, 985 mbar, 74% humidity)
   Weather weather(Temperature::celsius(6.0), Pressure::mbar(985.0), 74.0);
 
-  std::optional<Horizontal> opt = apparent.to_horizontal();
-  if(!opt.has_value()) {
+  Horizontal hor = apparent.to_horizontal().to_refracted(novas_optical_refraction, weather);
+  if(!hor) {
     std::cerr << "ERROR! observer has no Earth-based horizon.";
     return 1;
   }
-
-  Horizontal hor = opt.value().to_refracted(novas_optical_refraction, weather);
 
   // Let's print the calculated azimuth and elevation
   std::cout << hor.to_string() << "\n";

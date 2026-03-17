@@ -52,8 +52,8 @@ int main() {
   EOP eop(37, 0.0, 0.0, 0.0);
 
   Frame frame = Observer::on_earth(site, eop).reduced_accuracy_frame_at(Time::j2000());
-  GeodeticFrame gf = Observer::on_earth(site, eop).reduced_accuracy_frame_at(Time::j2000());
-  GeodeticFrame gfx = Observer::on_earth(site, eop).reduced_accuracy_frame_at(Time::undefined());
+  Frame gf = Observer::on_earth(site, eop).reduced_accuracy_frame_at(Time::j2000());
+  Frame gfx = Observer::on_earth(site, eop).reduced_accuracy_frame_at(Time::undefined());
   Frame gc = Observer::at_geocenter().reduced_accuracy_frame_at(Time::j2000());
 
   if(!test.check("observer.is_geodetic()", Observer::on_earth(site, eop).is_geodetic())) n++;
@@ -69,33 +69,33 @@ int main() {
           c.rises_above(Angle(20.0 * Unit::deg), gf).jd(),
           novas_rises_above(20.0, c._novas_object(), gf._novas_frame(), NULL), 1e-7)) n++;
   if(!test.equals("rises_above()",
-          c.rises_above(Angle(20.0 * Unit::deg), frame).value().jd(),
+          c.rises_above(Angle(20.0 * Unit::deg), frame).jd(),
           novas_rises_above(20.0, c._novas_object(), frame._novas_frame(), NULL), 1e-7)) n++;
   if(!test.equals("rises_above(refract)",
-          c.rises_above(Angle(20.0 * Unit::deg), frame, novas_standard_refraction, Weather::guess(site)).value().jd(),
+          c.rises_above(Angle(20.0 * Unit::deg), frame, novas_standard_refraction, Weather::guess(site)).jd(),
           novas_rises_above(20.0, c._novas_object(), frame._novas_frame(), novas_standard_refraction), 1e-7)) n++;
-  if(!test.check("rises_above(gc)", !c.rises_above(Angle(20.0 * Unit::deg), gc).has_value())) n++;
+  if(!test.check("rises_above(gc)", !c.rises_above(Angle(20.0 * Unit::deg), gc).is_valid())) n++;
   if(!test.check("rises_above(invalid geo)", !c.rises_above(Angle(20.0 * Unit::deg), gfx).is_valid())) n++;
 
   if(!test.equals("sets_below(geo)",
           c.sets_below(Angle(20.0 * Unit::deg), gf).jd(),
           novas_sets_below(20.0, c._novas_object(), gf._novas_frame(), NULL), 1e-7)) n++;
   if(!test.equals("sets_below()",
-          c.sets_below(Angle(20.0 * Unit::deg), frame).value().jd(),
+          c.sets_below(Angle(20.0 * Unit::deg), frame).jd(),
           novas_sets_below(20.0, c._novas_object(), frame._novas_frame(), NULL), 1e-7)) n++;
   if(!test.equals("sets_below(refract)",
-          c.sets_below(Angle(20.0 * Unit::deg), frame, novas_standard_refraction, Weather::guess(site)).value().jd(),
+          c.sets_below(Angle(20.0 * Unit::deg), frame, novas_standard_refraction, Weather::guess(site)).jd(),
           novas_sets_below(20.0, c._novas_object(), frame._novas_frame(), novas_standard_refraction), 1e-7)) n++;
-  if(!test.check("sets_below(gc)", !c.sets_below(Angle(20.0 * Unit::deg), gc).has_value())) n++;
+  if(!test.check("sets_below(gc)", !c.sets_below(Angle(20.0 * Unit::deg), gc).is_valid())) n++;
   if(!test.check("sets_below(invalid geo)", !c.sets_below(Angle(20.0 * Unit::deg), gfx).is_valid())) n++;
 
   if(!test.equals("transits(geo)",
           c.transits(gf).jd(),
           novas_transit_time(c._novas_object(), gf._novas_frame()), 1e-7)) n++;
   if(!test.equals("transits()",
-          c.transits(frame).value().jd(),
+          c.transits(frame).jd(),
           novas_transit_time(c._novas_object(), frame._novas_frame()), 1e-7)) n++;
-  if(!test.check("transits(gc)", !c.transits(gc).has_value())) n++;
+  if(!test.check("transits(gc)", !c.transits(gc).is_valid())) n++;
   if(!test.check("trasits(invalid geo)", !c.transits(gfx).is_valid())) n++;
 
   sky_pos tod = {};
@@ -118,12 +118,11 @@ int main() {
   if(!test.check("geometric(invalid)", !Planet((enum novas_planet) -1).geometric_in(frame).is_valid())) n++;
 
 
-  std::optional<EquatorialTrack> oet = c.equatorial_track(frame, Interval(Unit::hour));
-  if(!test.check("equatorial_track()", oet.has_value())) n++;
+  EquatorialTrack et = c.equatorial_track(frame, Interval(Unit::hour));
+  if(!test.check("equatorial_track()", et.is_valid())) n++;
 
   novas_track tr = {};
   novas_equ_track(c._novas_object(), frame._novas_frame(), 10.0, &tr);
-  EquatorialTrack et = oet.value();
   if(!test.equals("equatorial_track().range()", et.range().hours(), 1.0, 1e-12)) n++;
   if(!test.equals("equatorial_track().lon(0)", et.longitude_evolution().value(), tr.pos.lon * Unit::deg, 1e-12)) n++;
   if(!test.equals("equatorial_track().lon(1) ", et.longitude_evolution().rate(), tr.rate.lon * Unit::deg, 1e-10)) n++;
@@ -137,13 +136,12 @@ int main() {
   //if(!test.equals("equatorial_track().dis(2)", et.distance_evolution().acceleration(), tr.accel.dist * Unit::AU, 1e-3)) n++;
 
 
-  if(!test.check("horizontal_track(gc)", !c.horizontal_track(gc).has_value())) n++;
+  if(!test.check("horizontal_track(gc)", !c.horizontal_track(gc).is_valid())) n++;
 
-  std::optional<HorizontalTrack> oht = c.horizontal_track(frame, NULL);
-  if(!test.check("horizontal_track()", oht.has_value())) n++;
+  HorizontalTrack ht = c.horizontal_track(frame, NULL);
+  if(!test.check("horizontal_track()", ht.is_valid())) n++;
 
   novas_hor_track(c._novas_object(), frame._novas_frame(), NULL, &tr);
-  HorizontalTrack ht = oht.value();
   if(!test.equals("horizontal_track().lon(0)", ht.longitude_evolution().value(), tr.pos.lon * Unit::deg, 1e-12)) n++;
   if(!test.equals("horizontal_track().lon(1) ", ht.longitude_evolution().rate(), tr.rate.lon * Unit::deg, 1e-10)) n++;
   if(!test.equals("horizontal_track().lon(2)", ht.longitude_evolution().acceleration(), tr.accel.lon * Unit::deg, 1e-12)) n++;
@@ -157,13 +155,13 @@ int main() {
 
   test = TestUtil("Planet");
   if(!test.equals("rises_above(Sun)",
-          sun.rises_above(Angle(20.0 * Unit::deg), frame).value().jd(),
+          sun.rises_above(Angle(20.0 * Unit::deg), frame).jd(),
           novas_rises_above(20.0, sun._novas_object(), frame._novas_frame(), NULL), 1e-7)) n++;
   if(!test.equals("sets_below(Sun)",
-          sun.sets_below(Angle(20.0 * Unit::deg), frame).value().jd(),
+          sun.sets_below(Angle(20.0 * Unit::deg), frame).jd(),
           novas_sets_below(20.0, sun._novas_object(), frame._novas_frame(), NULL), 1e-7)) n++;
   if(!test.equals("transits(Sun)",
-          sun.transits(frame).value().jd(),
+          sun.transits(frame).jd(),
           novas_transit_time(sun._novas_object(), frame._novas_frame()), 1e-7)) n++;
 
 

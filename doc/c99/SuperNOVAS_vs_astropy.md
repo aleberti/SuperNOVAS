@@ -1,4 +1,4 @@
-# SuperNOVAS vs. astropy
+# SuperNOVAS C99 vs. astropy
 
 Nowadays __astropy__ is widely used in the astronomy community and it is known for its simplicity and elegance, but it 
 is rather slow ([putting it mildly](https://github.com/Sigmyne/SuperNOVAS#benchmarks)). In contrast, C is known to 
@@ -9,7 +9,7 @@ given date and observer location:
 <table>
 <tr>
 <th><b>astropy</b></th>
-<th><b>SuperNOVAS</b></th>
+<th><b>supernovas (C99)</b></th>
 </tr>
 <tr>
 <td>
@@ -49,8 +49,8 @@ frame = CIRS(obstime=time, location=loc)
 
 
 # apparent coordinates
-apparent = source.transform_to(frame);
- 
+
+app = source.transform_to(frame); 
 ```
 
 </td>

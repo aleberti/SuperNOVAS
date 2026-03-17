@@ -67,7 +67,7 @@ int main() {
   // - Next, convert that date to an astronomical time of a specific time
   //   scale. Let's say the above date was on the TAI... (It could be UTC, or
   //   GPS, or TDB...)
-  time1 = date.value().to_time(eop, NOVAS_TAI)
+  time1 = date.value().to_time(eop, NOVAS_TAI);
 
   // -------------------------------------------------------------------------
   // 1.c. Dates from broken-down time
@@ -79,7 +79,7 @@ int main() {
   // - Next, convert that date to an astronomical time of a specific time
   //   scale. Let's say the above date was on the TAI... (It could be UTC, or
   //   GPS, or TDB...)
-  Time time2 = date2.to_time(LEAP_SECONDS, DUT1, NOVAS_TAI)
+  Time time2 = date2.to_time(LEAP_SECONDS, DUT1, NOVAS_TAI);
 
 
   // -------------------------------------------------------------------------
@@ -109,11 +109,12 @@ int main() {
 
   // - Get a TDB-based JD date for time1
   double jd = time1.jd(NOVAS_TDB);
+  std::cout << "TDB date is " << jd << "\n";
 
   // - Or for higher precision, get a split JD...
   long ijd = time1.jd_day(NOVAS_TDB);
   double fjd = time1.jd_frac(NOVAS_TDB);
-  std::cout << "Split date is " << ijd << " / " << fjd << "\n";
+  std::cout << "Split TDB date is " << ijd << " / " << fjd << "\n";
 
 
 
@@ -134,14 +135,14 @@ int main() {
   // 4. Offset time
 
   // - Add 5.31 seconds to time1.
-  time1 += 5.31 * Unit::s;
+  time1 = time1 + 5.31 * Unit::s;
 
 
   // -------------------------------------------------------------------------
   // 5. Print time
 
   // - Print an UTC-based ISO timestamp to a string
-  std::cout << " Offset time is: " time1.to_iso_string() << "\n";
+  std::cout << " Offset time is: " << time1.to_iso_string() << "\n";
 
   // - Print a timestamp in a specific time measure, e.g. GPS time
   std::cout << " in TDB        : " << time1.to_string(NOVAS_TDB) <<"\n";

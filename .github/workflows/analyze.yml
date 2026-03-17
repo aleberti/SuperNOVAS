@@ -38,7 +38,7 @@ jobs:
       run: sudo apt-get install -y cppcheck
 
     - name: Run cppcheck on the C sources
-      run: make analyze
+      run: make -C src/c99 analyze
 
     - name: Run cppcheck on the C++ sources
-      run: make analyze-cpp
+      run: make -C src/cpp analyze

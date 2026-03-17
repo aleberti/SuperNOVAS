@@ -7,7 +7,7 @@
 
 
 # Regular object files
-$(OBJ)/%.o: $(SRC)/%.c $(OBJ) Makefile
+$(OBJ)/%.o: %.c $(OBJ) Makefile
 	$(CC) -o $@ -c $(CPPFLAGS) $(CFLAGS) $<
 
 # Shared library recipe
@@ -48,7 +48,7 @@ clean: clean-local
 .PHONY: distclean
 distclean: distclean-local
 
-CHECK_DIR ?= $(SRC)
+CHECK_DIR ?= .
 
 # Static code analysis using 'cppcheck'
 .PHONY: analyze

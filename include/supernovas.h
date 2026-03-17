@@ -23,6 +23,9 @@
 #ifndef NOVAS_NAMESPACE
 #  define NOVAS_NAMESPACE                       ///< Make C API available under the 'novas' namespace
 #endif
+
+#define _EXCLUDE_DEPRECATED                     ///< Let go of any deprecated C99 functions
+
 #include <novas.h>
 
 namespace supernovas {

@@ -79,11 +79,14 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - name: Build static library
-        run: make -C cpp static
+      - name: Build static C++ library
+        run: make static-cpp
 
-      - name: Build shared library
-        run: make -C cpp shared
+      - name: Build shared C++ library
+        run: make shared-cpp
+        
+      - name: Build C++ examples
+        run: make -C examples/cpp
 
 
 # Reverse build not yet supported in ubuntu-latest

@@ -9,23 +9,22 @@ OBJ := obj
 LANGUAGE := c++
 CHECK_DIR := .
 
+LIB ?= ../../lib
+
 ifeq ($(CXX),clang++)
   # Treat .c sources as C++, and use C++17
   CXXFLAGS += -x c++ -std=c++17
 endif
 
 # Use the definitions project definitions
-include ../config.mk
+include ../../config.mk
 
-C_SOURCES := $(subst src,../src,$(SOURCES))
-
-SRC := ../src
-LIB := ../lib
+C_SOURCES := $(addprefix ../c99/,$(SOURCES))
 
 CPP_SOURCES := $(wildcard *.cpp)
 CPP_OBJECTS := $(addprefix $(OBJ)/, $(subst .cpp,.opp,$(CPP_SOURCES)))
 
-CPPFLAGS += -I../include -DNOVAS_NAMESPACE
+CPPFLAGS += -I../../include -DNOVAS_NAMESPACE
 
 ifdef CXXFLAGS
   CFLAGS := $(CXXFLAGS)
@@ -64,6 +63,7 @@ clean:
 distclean: clean
 	@rm -rf $(LIB)/libsupernovas++.*
 
+
 # Built-in help screen for `make help`
 .PHONY: help
 help:
@@ -80,10 +80,12 @@ help:
 	@echo
 
 # This Makefile depends on the config and build snipplets.
-Makefile: ../config.mk ../build.mk
+Makefile: ../../config.mk ../../build.mk
 
 # ===============================================================================
 # Generic targets and recipes below...
 # ===============================================================================
 
-include ../build.mk
+include ../../build.mk
+
+vpath %.c ../c99

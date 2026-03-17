@@ -97,7 +97,6 @@ else()
     string(APPEND PC_LIBS_PRIVATE -l${MATH} " ")
 endif()
 
-
 if(ENABLE_CALCEPH OR ENABLE_CSPICE)
     find_package(Threads)
     
@@ -131,111 +130,22 @@ if(ENABLE_CSPICE)
 endif()
 
 # ----------------------------------------------------------------------------
-# Build the 'supernovas' library as a static OR as a shared lib.
-# depending on BUILD_SHARED_LIBS
+# Link applications against the C++ library also, if enabled
 
-# Sources
-set(SUPERNOVAS_CORE_SOURCES
-    src/target.c
-    src/observer.c
-    src/earth.c
-    src/equator.c
-    src/system.c
-    src/transform.c
-    src/cio.c
-    src/orbital.c
-    src/spectral.c
-    src/grav.c
-    src/nutation.c
-    src/timescale.c
-    src/frames.c
-    src/place.c
-    src/calendar.c
-    src/refract.c
-    src/naif.c
-    src/parse.c
-    src/util.c
-    src/planets.c
-    src/itrf.c
-    src/ephemeris.c
-    src/solsys3.c
-    src/solsys-ephem.c
-)
-
-add_library(core ${SUPERNOVAS_CORE_SOURCES})
-add_library(supernovas::core ALIAS core)
-
-set_target_properties(core PROPERTIES
-    VERSION ${PROJECT_VERSION}
-    SOVERSION ${PROJECT_VERSION_MAJOR}
-    OUTPUT_NAME supernovas
-)
-
-target_include_directories(core PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-)
-
-# Link with math libs as necessary
-if(MATH_LIB)
-    target_link_libraries(core ${MATH})
+if(ENABLE_CPP)
+    string(APPEND PC_LIBS "-lsupernovas++ ")
 endif()
 
 # ----------------------------------------------------------------------------
-# Plugins
+# Build libraries from source
 
-# plugins via external libraries (e.g. calceph or cspice). 
-function(solsys_plugin EPHEM_LIB_NAME)
-    set(PLUGIN solsys-${EPHEM_LIB_NAME})
-    
-    add_library(${PLUGIN} src/${PLUGIN}.c)
-    add_library(supernovas::${PLUGIN} ALIAS ${PLUGIN})
-
-    set_target_properties(${PLUGIN} PROPERTIES
-        VERSION ${PROJECT_VERSION}
-        SOVERSION ${PROJECT_VERSION_MAJOR}
-    )
-    
-    if(CMAKE_USE_PTHREADS_INIT)
-        # if Threads is provided via pthread, then compile source accordingly
-        target_compile_definitions(${PLUGIN} PRIVATE SUPERNOVAS_USE_PTHREAD)
-    endif()
-    
-    target_include_directories(${PLUGIN} PRIVATE ${supernovas_INCLUDE_DIRS})
-    
-    find_library(EPHEM_LIBRARY ${EPHEM_LIB_NAME} REQUIRED)
-    
-    target_link_libraries(solsys-${EPHEM_LIB_NAME}
-        supernovas::core
-        ${EPHEM_LIBRARY}
-        ${MATH}
-        Threads::Threads
-    )
-endfunction()
-
-# Process plugin options...
-if(ENABLE_CALCEPH)
-    solsys_plugin(calceph)
-    find_path(CALCEPH_INCLUDE_DIR "calceph.h" REQUIRED)
-    target_include_directories(solsys-calceph PRIVATE "${CALCEPH_INCLUDE_DIR}")
-endif()
-
-if(ENABLE_CSPICE)
-    solsys_plugin(cspice)
-    find_path(CSPICE_INCLUDE_DIR "cspice/SpiceUsr.h" REQUIRED)
-    target_include_directories(solsys-cspice PRIVATE "${CSPICE_INCLUDE_DIR}")
-endif()
+add_subdirectory(src)
 
 # ----------------------------------------------------------------------------
 # Testing, examples, and benchmarks...
 
 # Run tests for the enabled options below...
 enable_testing()
-
-# C++ library
-if(ENABLE_CPP_LIBS)
-    add_subdirectory(cpp)
-endif()
 
 # Examples
 if(BUILD_EXAMPLES)
@@ -271,6 +181,10 @@ if(ENABLE_CSPICE)
     list(APPEND INSTALL_TARGETS solsys-cspice)
 endif()
 
+if(ENABLE_CPP)
+    list(APPEND INSTALL_TARGETS cpp)
+endif()
+
 install(TARGETS ${INSTALL_TARGETS} EXPORT supernovasTargets)
 
 
@@ -283,45 +197,46 @@ install(FILES include/novas.h
 )
 
 if(ENABLE_CALCEPH)
-   install(FILES include/novas-calceph.h
-       TYPE INCLUDE
-       COMPONENT Development
-   )
+    install(FILES include/novas-calceph.h
+        TYPE INCLUDE
+        COMPONENT Development
+    )
 endif()
 
 if(ENABLE_CSPICE)
-   install(FILES include/novas-cspice.h
-       TYPE INCLUDE
-       COMPONENT Development
-   )
+    install(FILES include/novas-cspice.h
+        TYPE INCLUDE
+        COMPONENT Development
+    )
 endif()
 
-# Install CHANGELOG
-install(FILES CHANGELOG.md 
-  TYPE DOC
-  COMPONENT Development   
-)
+if(ENABLE_CPP)
+    install(FILES include/supernovas.h
+        TYPE INCLUDE
+        COMPONENT Development
+    )
+endif()
 
-# Install CONTRIBUTING.md (Development)
-install(FILES CONTRIBUTING.md 
+# Install markdown files
+install(FILES CHANGELOG.md CONTRIBUTING.md
     TYPE DOC
-    COMPONENT Development     
+    COMPONENT Development   
 )
 
 # For examples/ dir, list just the directory, not the individual files installed.
-install(CODE "message(STATUS \"Installing: <prefix>/${CMAKE_INSTALL_DOCDIR}/examples/*\")")
+install(CODE "message(STATUS \"Installing: <prefix>/${CMAKE_INSTALL_DOCDIR}/examples/\")")
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/examples
-   TYPE DOC
-   MESSAGE_NEVER
-   COMPONENT Development
+    TYPE DOC
+    MESSAGE_NEVER
+    COMPONENT Development
 )
 
 # For legacy/ dir, list just the directory, not the individual files installed.
 install(CODE "message(STATUS \"Installing: <prefix>/${CMAKE_INSTALL_DOCDIR}/legacy/*\")")
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/legacy
-   TYPE DOC
-   MESSAGE_NEVER
-   COMPONENT Development
+    TYPE DOC
+    MESSAGE_NEVER
+    COMPONENT Development
 )
 
 install(EXPORT supernovasTargets

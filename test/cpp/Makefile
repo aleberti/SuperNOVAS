@@ -1,12 +1,11 @@
 # Flags for measuring test coverage
 
-CPPFLAGS += -I. -I../../include 
+CPPFLAGS += -I../../include
 LDFLAGS += --coverage -lm 
 
 include ../../config.mk
-SRC := ../../src
 
-CPP_SRC := ../../cpp
+CPP_SRC := ../../src/cpp
 CPP_SOURCES = $(wildcard $(CPP_SRC)/*.cpp)
 CPP_OBJECTS = $(subst .cpp,.opp, $(subst $(CPP_SRC)/,obj/, $(CPP_SOURCES)))
 
@@ -23,10 +22,6 @@ build: libnovas++.a $(TESTS)
 run: build
 	@for prog in $(TESTS) ; do ./$${prog} ; done
 
-.PHONY: coverage
-coverage: run
-	$(MAKE) cov
-
 %Test: %Test.cpp $(CPP_OBJECTS)
 	$(CXX) -o $@ $(CPPFLAGS) -g $(CXXFLAGS) $^ $(LDFLAGS) libnovas++.a
 
@@ -37,18 +32,12 @@ libnovas++.a: $(OBJECTS)
 obj:
 	mkdir $@
 
-obj/%.o: $(SRC)/%.c | obj
+obj/%.o: %.c | obj
+	@echo $(CPPFLAGS)
 	$(CXX) -c -o $@ -DNOVAS_NAMESPACE $(CPPFLAGS) $< 
 
-obj/%.opp: $(CPP_SRC)/%.cpp | obj
+obj/%.opp: %.cpp | obj
 	$(CXX) -c -o $@ $(CPPFLAGS) $(CXXFLAGS) -pg -Wall -fno-elide-constructors -fno-default-inline --coverage $<
-
-cov: cov.info
-	genhtml $< -o $@
-
-cov.info:
-	geninfo obj -o $@
-	lcov --remove $@ '*/usr/*' '*/include/*' -o $@
 
 .PRECIOUS: %.c.gcov
 %.c.gcov: %-%.gcno %-%.gcda
@@ -74,3 +63,7 @@ clean: clean-test clean-cov
 .PHONY: distclean
 distclean: clean
 	rm -f libnovas++.a
+
+vpath %.c ../../src/c99
+vpath %.cpp ../../src/cpp
+

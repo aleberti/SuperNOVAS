@@ -177,7 +177,7 @@ static const EOP& extract_eop(const Frame &frame) {
  *
  * @sa sets_below(), transits()
  */
-std::optional<Time> Source::rises_above(const Angle& el, const Frame &frame, RefractionModel ref, const Weather& weather) const {
+std::optional<Time> Source::rises_above(const Angle& el, const Frame &frame, novas::RefractionModel ref, const Weather& weather) const {
   static const char *fn = "Source::rises_above()";
 
   if(frame.observer().is_geodetic()) {
@@ -236,7 +236,7 @@ std::optional<Time> Source::transits(const Frame &frame) const {
  *
  * @sa rises_above(), transits()
  */
-std::optional<Time> Source::sets_below(const Angle& el, const Frame &frame, RefractionModel ref, const Weather& weather) const {
+std::optional<Time> Source::sets_below(const Angle& el, const Frame &frame, novas::RefractionModel ref, const Weather& weather) const {
   static const char *fn = "Source::sets_below()";
 
   if(frame.observer().is_geodetic()) {
@@ -273,7 +273,7 @@ std::optional<Time> Source::sets_below(const Angle& el, const Frame &frame, Refr
  *
  * @sa sets_below(), transits()
  */
-Time Source::rises_above(const Angle& el, const GeodeticFrame &frame, RefractionModel ref, const Weather& weather) const {
+Time Source::rises_above(const Angle& el, const GeodeticFrame &frame, novas::RefractionModel ref, const Weather& weather) const {
   std::optional<Time> opt = rises_above(el, static_cast<Frame>(frame), ref, weather);
   if(!opt.value().is_valid())
     novas_trace_invalid("Source::rises_above()");
@@ -312,7 +312,7 @@ Time Source::transits(const GeodeticFrame &frame) const {
  *
  * @sa rises_above(), transits()
  */
-Time Source::sets_below(const Angle& el, const GeodeticFrame &frame, RefractionModel ref, const Weather& weather) const {
+Time Source::sets_below(const Angle& el, const GeodeticFrame &frame, novas::RefractionModel ref, const Weather& weather) const {
   std::optional<Time> opt = sets_below(el, static_cast<Frame>(frame), ref, weather);
   if(!opt.value().is_valid())
     novas_trace_invalid("Source::sets_below()");

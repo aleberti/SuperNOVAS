@@ -59,7 +59,6 @@
 					</folderInfo>
 					<sourceEntries>
 						<entry excluding="cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="cpp"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

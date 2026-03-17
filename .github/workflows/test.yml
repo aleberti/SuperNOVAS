@@ -36,7 +36,9 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CC: gcc
+      CXX: g++
       CFLAGS: -O0
+      ENABLE_CPP: 1
     steps:
 
     - uses: actions/checkout@v6

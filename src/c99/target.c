@@ -427,7 +427,7 @@ short make_object(enum novas_object_type type, long number, const char *name, co
   if(name) {
     int i;
 
-    for(i = 0; name[i]; i++) {
+    for(i = 0; i < (int) sizeof(source->name) && name[i]; i++) {
       // if input name is not null-terminated return error;
       if(i == (sizeof(source->name) - 1))
         return novas_error(5, EINVAL, fn, "unterminated source name");

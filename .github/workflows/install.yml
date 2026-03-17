@@ -32,11 +32,12 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            cc: gcc
+            cc: g++
           - os: macos-latest
             cc: clang
     env:
       CC: ${{ matrix.cc }}
+      ENABLE_CPP: 1
     steps:
       - uses: actions/checkout@v6
 

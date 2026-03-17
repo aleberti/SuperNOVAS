@@ -69,7 +69,7 @@ int main() {
   // Set the astrometric time of observation...
 
   // Set the time of observation to the current UTC-based UNIX time
-  Time t = Time::now(eop)
+  Time t = Time::now(eop);
 
   // ... Or you could set a time from a string calendar date
   /*
@@ -113,7 +113,7 @@ int main() {
   Apparent apparent = source.apparent_in(frame);
 
   // Let's print the apparent position
-  std::cout << apparent.to_string()) << "\n";
+  std::cout << apparent.to_string() << "\n";
 
   // -------------------------------------------------------------------------
   // Convert the apparent position on sky to horizontal coordinates

@@ -231,16 +231,21 @@ Horizontal Horizontal::to_unrefracted(RefractionModel ref, const Weather& weathe
  * @sa to_unrefracted(), Apparent::to_horizontal()
  */
 Apparent Horizontal::to_apparent(const Frame& frame, double rv, double distance) const {
+  static const char *fn = "Horizontal::to_apparent()";
+
   sky_pos p = {};
   if(novas_hor_to_app(frame._novas_frame(), longitude().deg(), latitude().deg(), NULL, NOVAS_TOD, &p.ra, &p.dec) != 0) {
-    novas_trace_invalid("Horizontal::to_apparent");
+    novas_trace_invalid(fn);
     return Apparent::undefined();
   }
 
   p.rv = rv / (Unit::au / Unit::day);
   p.dis = distance / Unit::au;
   radec2vector(p.ra, p.dec, 1.0, p.r_hat);
-  return Apparent::from_tod_sky_pos(p, frame);
+  Apparent a  =Apparent::from_tod_sky_pos(frame, &p);
+  if(!a.is_valid())
+    novas_trace_invalid(fn);
+  return a;
 }
 
 /**

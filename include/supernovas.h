@@ -2233,7 +2233,7 @@ private:
 
   explicit Apparent(const Frame& frame);
 
-  Apparent(const Frame& frame, enum novas_reference_system sys, sky_pos p);
+  Apparent(const Frame& frame, enum novas_reference_system sys, const sky_pos *p);
 
   Apparent(const Frame& frame, enum novas_reference_system sys, double ra_rad, double dec_rad, double rv_ms = 0.0);
 
@@ -2275,9 +2275,9 @@ public:
 
   static Apparent tod(const Angle& ra, const Angle& dec, const Frame& frame, const ScalarVelocity& rv);
 
-  static Apparent from_tod_sky_pos(sky_pos pos, const Frame& frame);
+  static Apparent from_tod_sky_pos(const Frame& frame, const sky_pos *pos);
 
-  static Apparent from_cirs_sky_pos(sky_pos pos, const Frame& frame);
+  static Apparent from_cirs_sky_pos( const Frame& frame, const sky_pos *pos);
 
   static const Apparent& undefined();
 };

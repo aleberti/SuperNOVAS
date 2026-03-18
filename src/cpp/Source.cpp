@@ -88,7 +88,7 @@ Apparent Source::apparent_in(const Frame& frame) const {
   sky_pos pos = {};
 
   if(novas_sky_pos(&_object, frame._novas_frame(), NOVAS_TOD, &pos) == 0) {
-    Apparent app = Apparent::from_tod_sky_pos(pos, frame);
+    Apparent app = Apparent::from_tod_sky_pos(frame, &pos);
     if(app)
       return app;
   }
@@ -660,7 +660,7 @@ int Planet::de_number() const {
 Coordinate Planet::mean_radius() const {
   static const double r[] = NOVAS_PLANET_RADII_INIT;
   if(!is_valid())
-    return Coordinate(NAN);
+    return Coordinate::undefined();
 
   return Coordinate(r[_object.number]);
 }
@@ -730,7 +730,10 @@ double Planet::mass() const {
 Apparent Planet::approx_apparent_in(const Frame& frame) const {
   sky_pos pos = {};
   novas_approx_sky_pos(novas_id(), frame._novas_frame(), NOVAS_TOD, &pos);
-  return Apparent::from_tod_sky_pos(pos, frame);
+  Apparent a = Apparent::from_tod_sky_pos(frame, &pos);
+  if(!a.is_valid())
+    novas_trace_invalid("Source::apparent_in()");
+  return a;
 }
 
 /**
@@ -785,7 +788,10 @@ Geometric Planet::approx_geometric_in(const Frame& frame) const {
     v[i] += f->sun_vel[i];
   }
 
-  return Geometric(frame, Position(p, Unit::AU), Velocity(v, Unit::AU / Unit::day));
+  Geometric g(frame, Position(p, Unit::AU), Velocity(v, Unit::AU / Unit::day));
+  if(!g.is_valid())
+    novas_trace_invalid("Source::geometric_in()");
+  return g;
 }
 
 

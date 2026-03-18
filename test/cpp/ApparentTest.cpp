@@ -29,12 +29,16 @@ int main() {
   p.rv = -133.0;
   p.dis = Unit::pc / Unit::au;
 
-  if(!test.check("invalid", !Apparent::from_tod_sky_pos(p, Frame::undefined()).is_valid())) n++;
+  if(!test.check("from_tod_sky_pos(invalid frame)", !Apparent::from_tod_sky_pos(Frame::undefined(), &p).is_valid())) n++;
+  if(!test.check("from_cirs_sky_pos(invalid frame)", !Apparent::from_cirs_sky_pos(Frame::undefined(), &p).is_valid())) n++;
 
   EOP eop(32, 0.1, 0.2 * Unit::arcsec, 0.3 * Unit::arcsec);
   Frame frame = Observer::at_geocenter().reduced_accuracy_frame_at(Time::j2000());
 
-  Apparent tod = Apparent::from_tod_sky_pos(p, frame);
+  if(!test.check("from_tod_sky_pos(pos=NULL)", !Apparent::from_tod_sky_pos(frame, NULL).is_valid())) n++;
+  if(!test.check("from_cirs_sky_pos(pos=NULL)", !Apparent::from_cirs_sky_pos(frame, NULL).is_valid())) n++;
+
+  Apparent tod = Apparent::from_tod_sky_pos(frame, &p);
   if(!test.check("equatorial()", tod.equatorial() == Equatorial(p.ra * Unit::hour_angle, p.dec * Unit::deg, Equinox::tod(Time::j2000())))) n++;
   if(!test.equals("frame().observer()", tod.frame().observer().type(), NOVAS_OBSERVER_AT_GEOCENTER)) n++;
   if(!test.check("frame().time()", tod.frame().time() == Time::j2000())) n++;
@@ -59,7 +63,7 @@ int main() {
   Apparent tod2 = Apparent::tod(Angle(p.ra * Unit::hour_angle), Angle(p.dec * Unit::deg), frame, ScalarVelocity(p.rv * Unit::km / Unit::s));
   if(!test.check("tod(Angle...)", tod2.equatorial() == tod.equatorial())) n++;
 
-  Apparent cirs = Apparent::from_cirs_sky_pos(p, frame);
+  Apparent cirs = Apparent::from_cirs_sky_pos(frame, &p);
   double ra_tod = cirs_to_app_ra(frame.time().jd(), NOVAS_REDUCED_ACCURACY, p.ra);
   if(!test.check("cirs(CIRS)", cirs.cirs() == Equatorial(p.ra * Unit::hour_angle, p.dec * Unit::deg, Equinox::cirs(Time::j2000())))) n++;
   if(!test.check("equatorial(CIRS)", cirs.equatorial() == Equatorial(ra_tod * Unit::hour_angle, p.dec * Unit::deg, Equinox::tod(Time::j2000())))) n++;
@@ -67,31 +71,31 @@ int main() {
   Apparent cirs2 = Apparent::cirs(Angle(p.ra * Unit::hour_angle), Angle(p.dec * Unit::deg), frame, ScalarVelocity(p.rv * Unit::km / Unit::s));
   if(!test.check("cirs(Angle...)", cirs2.cirs() == cirs.cirs())) n++;
 
-  if(!test.check("from_to_sky_pos()", Apparent::from_tod_sky_pos(p, frame).is_valid())) n++;
+  if(!test.check("from_to_sky_pos()", Apparent::from_tod_sky_pos(frame, &p).is_valid())) n++;
 
   sky_pos p1 = p; p1.ra = NAN;
-  if(!test.check("invalid p.ra", !Apparent::from_tod_sky_pos(p1, frame).is_valid())) n++;
+  if(!test.check("invalid p.ra", !Apparent::from_tod_sky_pos(frame, &p1).is_valid())) n++;
 
   p1 = p; p1.dec = NAN;
-  if(!test.check("invalid p.dec", !Apparent::from_tod_sky_pos(p1, frame).is_valid())) n++;
+  if(!test.check("invalid p.dec", !Apparent::from_tod_sky_pos(frame, &p1).is_valid())) n++;
 
   p1 = p; p1.rv = NAN;
-  if(!test.check("invalid p.rv", !Apparent::from_tod_sky_pos(p1, frame).is_valid())) n++;
+  if(!test.check("invalid p.rv", !Apparent::from_tod_sky_pos(frame, &p1).is_valid())) n++;
 
   p1 = p; p1.rv = Constant::c + 1.0;
-  if(!test.check("from_to_sky_pos(p.rv > c)", !Apparent::from_tod_sky_pos(p1, frame).is_valid())) n++;
-  if(!test.check("from_cirs_sky_pos(p.rv > c)", !Apparent::from_cirs_sky_pos(p1, frame).is_valid())) n++;
+  if(!test.check("from_to_sky_pos(p.rv > c)", !Apparent::from_tod_sky_pos(frame, &p1).is_valid())) n++;
+  if(!test.check("from_cirs_sky_pos(p.rv > c)", !Apparent::from_cirs_sky_pos(frame, &p1).is_valid())) n++;
 
   p1 = p; p1.dis = NAN;
-  if(!test.check("from_tod_sky_pos(invalid p.dis)", !Apparent::from_tod_sky_pos(p1, frame).is_valid())) n++;
-  if(!test.check("from_cirs_sky_pos(invalid p.dis)", !Apparent::from_cirs_sky_pos(p1, frame).is_valid())) n++;
+  if(!test.check("from_tod_sky_pos(invalid p.dis)", !Apparent::from_tod_sky_pos(frame, &p1).is_valid())) n++;
+  if(!test.check("from_cirs_sky_pos(invalid p.dis)", !Apparent::from_cirs_sky_pos(frame, &p1).is_valid())) n++;
 
   Site site(-15.0 * Unit::deg, 42.0 * Unit::deg, 268.0 * Unit::m);
   frame = Observer::on_earth(site, eop).reduced_accuracy_frame_at(Time::j2000());
 
   double az = 0.0, el = 0.0;
   novas_app_to_hor(frame._novas_frame(), NOVAS_TOD, p.ra, p.dec, NULL, &az, &el);
-  Horizontal opt = Apparent::from_tod_sky_pos(p, frame).to_horizontal();
+  Horizontal opt = Apparent::from_tod_sky_pos(frame, &p).to_horizontal();
 
   if(!test.check("to_horizontal(site)", opt.is_valid())) n++;
   if(!test.equals("to_horizontal() az", opt.azimuth().deg(), az, 1e-13)) n++;

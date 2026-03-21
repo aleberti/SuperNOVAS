@@ -64,7 +64,7 @@ int main() {
 
 
   // -------------------------------------------------------------------------
-  // Define a sidereal source
+  // Define an orbital source
 
   // Orbital Parameters for the asteroid Ceres from the Minor Planet Center
   // (MPC) at JD 2460600.5

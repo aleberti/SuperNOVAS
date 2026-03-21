@@ -5,7 +5,7 @@
  * @author Attila Kovacs
  *
  *  Example file for using the SuperNOVAS C/C++ library for determining positions for
- *  Solary-system sources, with the NAIF CSPICE toolkit providing access to ephemeris
+ *  Solar-system sources, with the NAIF CSPICE toolkit providing access to ephemeris
  *  files.
  *
  *  You will need access to the NAIF CSPICE library (unversioned `libcspice.so` or else
@@ -42,7 +42,7 @@
 #define  POLAR_DX         230.0     ///< [mas] Earth polar offset x, e.g. from IERS Bulletin A.
 #define  POLAR_DY         -62.0     ///< [mas] Earth polar offset y, e.g. from IERS Bulletin A.
 
-int main(int argc, char *argv[]) {
+int main(int argc, const char *argv[]) {
   // Program Options -------------------------------------------------------->
   const char *datafile = "/path/to/de440s.bsp";  // // Ephemeris file to use
 

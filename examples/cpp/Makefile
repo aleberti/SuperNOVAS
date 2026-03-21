@@ -7,13 +7,23 @@
 # Use the definitions project definitions
 include ../../config.mk
 
-EXAMPLES = example-star example-high-z example-time
+EXAMPLES = example-star example-high-z example-orbital example-time example-rise-set
 
 LIB ?= ../../lib
 
 CPPFLAGS += -I../../include
 CXXFLAGS ?= $(CPPFLAGS)
 LDFLAGS += -L$(LIB) -lsupernovas -lsupernovas++
+
+ifeq ($(CALCEPH_SUPPORT),1)
+  EXAMPLES += example-calceph
+  LDFLAGS += -lsolsys-calceph -lcalceph
+endif
+
+ifeq ($(CSPICE_SUPPORT),1)
+  EXAMPLES += example-cspice
+  LDFLAGS += -lsolsys-cspice -lcspice
+endif
 
 .PHONY: all
 all: $(EXAMPLES)

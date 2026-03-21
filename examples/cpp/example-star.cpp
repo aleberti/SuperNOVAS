@@ -10,7 +10,7 @@
  *  Link with
  *
  *  ```
- *   -lsupernovas++
+ *   -lsupernovas -lsupernovas++
  *  ```
  */
 
@@ -109,10 +109,15 @@ int main() {
   // novas_use_calceph(planets);
 
   // -------------------------------------------------------------------------
+  // Without a planet provider, we are stuck with reduced (mas) precisions
+  // only...
+  enum novas_accuracy accuracy = NOVAS_REDUCED_ACCURACY;      // mas-level precision, typically
+
+  // -------------------------------------------------------------------------
   // Initialize the observing frame with the given observer location and
   // time of observation. Without a planet provider, we are stuck with reduced
   // (mas) precisions only...
-  auto frame = obs.reduced_accuracy_frame_at(t);
+  auto frame = obs.frame_at(t, accuracy);
 
   // -------------------------------------------------------------------------
   // Calculate the precise apparent position.

@@ -1,14 +1,11 @@
 /**
  * @file
  *
- * @date Created  on Jan 12, 2026
+ * @date Created  on Jan 9, 2025
  * @author Attila Kovacs
  *
- *  Example file for using the SuperNOVAS C/C++ library for determining positions for
- *  distant galaxies and quasars, or other high-redshift objects.
- *
- *  It's the same recipe as `example-star.c`, except that we define the object of
- *  interest a little differently.
+ *  Example file for using the SuperNOVAS C/C++ library for checking rise, set, or transit times
+ *  for sources observed from Earth's surface or airspace.
  *
  *  Link with
  *
@@ -21,19 +18,33 @@
 
 #include <supernovas.h>      ///< SuperNOVAS functions and definitions
 
-
 using namespace supernovas;
 
 // Below are some Earth orientation values. Here we define them as constants, but they may
 // of course be variables. They should be set to the appropriate values for the time
-// of observation based on the IERS Bulletins or data service...
+// of observation based on the IERS Bulletins...
 
 #define  LEAP_SECONDS     37        ///< [s] current leap seconds from IERS Bulletin C
 #define  DUT1             0.114     ///< [s] current UT1 - UTC time difference from IERS Bulletin A
 #define  POLAR_DX         230.0     ///< [mas] Earth polar offset x, e.g. from IERS Bulletin A.
 #define  POLAR_DY         -62.0     ///< [mas] Earth polar offset y, e.g. from IERS Bulletin A.
 
-int main() {
+/*
+ * example-rise-set [elevation]
+ *
+ * Arguments:
+ *
+ *   elevation    [deg] elevation angle (default 0.0).
+ *
+ */
+int main(int argc, const char *argv[]) {
+  // Input parameters
+  Angle el = Angle(0.0);            // [deg] elevation angle (set via command-line argument)
+
+  // Check if called with argument.
+  if(argc > 1)
+    el = Angle(strtod(argv[1], NULL) * Unit::deg);
+
   // We'll print debugging messages and error traces...
   novas_debug(NOVAS_DEBUG_ON);
 
@@ -43,16 +54,12 @@ int main() {
   // e.g. as obtained from IERS bulletins or data service:
   EOP eop(LEAP_SECONDS, DUT1, POLAR_DX * Unit::mas, POLAR_DY * Unit::mas);
 
-
   // -------------------------------------------------------------------------
-  // Define a high-z source.
+  // Define a source
+  // (We'll use the Sun, but see other examples for other types of sources...
 
-  // 3c273: 12h29m6.6997s +2d3m8.598s (ICRS), z=0.158339
-  auto entry = CatalogEntry("3c273", Equatorial("12h29m6.6997s", "+2d3m8.598s"))
-          .redshift(0.158339);
+  auto source = Planet::sun();
 
-  // Define a source from the catalog coordinates
-  auto source = entry.to_source();
 
 
   // -------------------------------------------------------------------------
@@ -65,6 +72,7 @@ int main() {
   auto obs = Observer::on_earth(Site::from_GPS(50.7374, 7.0982, 60.0), eop);
 
 
+
   // -------------------------------------------------------------------------
   // Set the astrometric time of observation...
 
@@ -73,13 +81,13 @@ int main() {
 
   // ... Or you could set a time from a string calendar date
   /*
-  CalendarDate date = Calendar::gregorian().parse_date("2026-01-09 12:33:15.342+0200");
-  if(!date) {
-    std::cerr << "ERROR! could not parse date string.\n";
-    return 1;
-  }
-  Time t = date.value().to_time(eop, NOVAS_UTC);
-  */
+      CalendarDate date = Calendar::gregorian().parse_date("2026-01-09 12:33:15.342+0200");
+      if(!date) {
+        std::cerr << "ERROR! could not parse date string.\n";
+        return 1;
+      }
+      Time t = date.value().to_time(eop, NOVAS_UTC);
+   */
 
   // ... Or you could set a time as a Julian date any known timescale.
   //Time t(NOVAS_JD_J2000, 32, 0.0);
@@ -114,26 +122,49 @@ int main() {
   auto frame = obs.frame_at(t, accuracy);
 
   // -------------------------------------------------------------------------
-  // Calculate the precise apparent position.
-  Apparent apparent = source.apparent_in(frame);
+  // Print source name to output
+  std::cout << source.to_string() << "observed from " << obs.site().to_string() << ":\n";
 
-  // Let's print the apparent position
-  std::cout << apparent.to_string() << "\n";
+
 
   // -------------------------------------------------------------------------
-  // Convert the apparent position on sky to horizontal coordinates
+  // Define local weather (for refraction correction)
   // We'll use an optical refraction model with local weather parameters...
   // (6 C deg, 985 mbar, 74% humidity)
   Weather weather(Temperature::celsius(6.0), Pressure::mbar(985.0), 74.0);
 
-  Horizontal hor = apparent.to_horizontal().to_refracted(novas_optical_refraction, weather);
-  if(!hor) {
-    std::cerr << "ERROR! observer has no Earth-based horizon.";
-    return 1;
+
+
+  // -------------------------------------------------------------------------
+  // Calculate next UTC-based date/time source rises above 20 degrees elevation
+  // (as corrected for optical refraction under a standard atmosphere)
+  Time t_rise = source.rises_above(el, frame, novas_optical_refraction, weather);
+
+  if(!t_rise) {
+    std::cout << " will not rise above " << el.to_string() << " degrees\n";
+  }
+  else {
+    std::cout << " will rise above " << el.to_string() << " degrees at  : " << t_rise.to_string() << "\n";
   }
 
-  // Let's print the calculated azimuth and elevation
-  std::cout << hor.to_string() << "\n";
+  // -------------------------------------------------------------------------
+  // Calculate next UTC-based date/time source transits at observer location
+  Time t_transit = source.transits_in(frame);
+
+  std::cout << " will transit at                   : " << t_transit.to_string() << "\n";
+
+
+  // -------------------------------------------------------------------------
+  // Calculate next UTC-based date/time source sets below 20 degrees elevation
+  // (as corrected for optical refraction under a standard atmosphere)
+  Time t_set = source.sets_below(el, frame, novas_optical_refraction, weather);
+
+  if(!t_set) {
+    std::cout << " will not set below " << el.to_string() << " degrees\n";
+  }
+  else {
+    std::cout << " will set below " << el.to_string() << " degrees at  : " << t_rise.to_string() << "\n";
+  }
 
   return 0;
 }

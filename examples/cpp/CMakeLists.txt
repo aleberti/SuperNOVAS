@@ -31,8 +31,23 @@ if(NOT PROJECT_NAME)
 endif()
 
 
-# Build all examples
-FILE(GLOB EXAMPLE_PROGRAMS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.cpp)
+# List of example programs to build
+set(EXAMPLE_PROGRAMS
+    example-star
+    example-time
+    example-high-z
+    example-orbital
+    example-rise-set
+)
+
+if(supernovas_solsys-calceph_FOUND)
+    list(APPEND EXAMPLE_PROGRAMS example-calceph)
+endif()
+
+if(supernovas_solsys-cspice_FOUND)
+    list(APPEND EXAMPLE_PROGRAMS example-cspice)
+endif()
+
 
 # Test programs, matching the test sources
 list(TRANSFORM EXAMPLE_PROGRAMS REPLACE "[.]cpp$" "")

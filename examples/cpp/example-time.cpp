@@ -9,7 +9,7 @@
  *  Link with
  *
  *  ```
- *   -lsupernovas
+ *   -lsupernovas -lsupernovas++
  *  ```
  */
 

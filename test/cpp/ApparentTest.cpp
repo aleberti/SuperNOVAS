@@ -25,7 +25,7 @@ int main() {
   if(!test.check("radial_velocity(invalid)", !x.radial_velocity().is_valid())) n++;
   if(!test.check("distance(invalid)", !x.distance().is_valid())) n++;
   if(!test.check("equatorial(invalid)", !x.equatorial().is_valid())) n++;
-  if(!test.check("to_cirs(invalid)", !x.to_cirs().is_valid())) n++;
+  if(!test.check("to_cirs(invalid)", !x.cirs().is_valid())) n++;
   if(!test.check("ecliptic(invalid)", !x.ecliptic().is_valid())) n++;
   if(!test.check("galactic(invalid)", !x.galactic().is_valid())) n++;
   if(!test.check("astrometric_position(invalid)", !x.astrometric_position().is_valid())) n++;
@@ -73,7 +73,7 @@ int main() {
   if(!test.check("astrometric_position(frame invalid)", !x.astrometric_position().is_valid())) n++;
 
   double ra_cirs = app_to_cirs_ra(frame.time().jd(), NOVAS_REDUCED_ACCURACY, p.ra);
-  if(!test.check("to_cirs()", tod.to_cirs() == Equatorial(ra_cirs * Unit::hour_angle, p.dec * Unit::deg, Equinox::cirs(Time::j2000())))) n++;
+  if(!test.check("to_cirs()", tod.cirs() == Equatorial(ra_cirs * Unit::hour_angle, p.dec * Unit::deg, Equinox::cirs(Time::j2000())))) n++;
 
   Apparent tod2 = Apparent::from_tod(Angle::undefined(), Angle(p.dec * Unit::deg), frame, ScalarVelocity(p.rv * Unit::km / Unit::s));
   if(!test.check("from_tod(invalid RA)", !tod2.is_valid())) n++;
@@ -83,14 +83,14 @@ int main() {
 
   Apparent cirs = Apparent::from_cirs_sky_pos(frame, &p);
   double ra_tod = cirs_to_app_ra(frame.time().jd(), NOVAS_REDUCED_ACCURACY, p.ra);
-  if(!test.check("to_cirs(CIRS)", cirs.to_cirs() == Equatorial(p.ra * Unit::hour_angle, p.dec * Unit::deg, Equinox::cirs(Time::j2000())))) n++;
+  if(!test.check("to_cirs(CIRS)", cirs.cirs() == Equatorial(p.ra * Unit::hour_angle, p.dec * Unit::deg, Equinox::cirs(Time::j2000())))) n++;
   if(!test.check("equatorial(CIRS)", cirs.equatorial() == Equatorial(ra_tod * Unit::hour_angle, p.dec * Unit::deg, Equinox::tod(Time::j2000())))) n++;
 
   Apparent cirs2 = Apparent::from_cirs(Angle::undefined(), Angle(p.dec * Unit::deg), frame, ScalarVelocity(p.rv * Unit::km / Unit::s));
   if(!test.check("from_cirs(invalid RA)", !cirs2.is_valid())) n++;
 
   cirs2 = Apparent::from_cirs(Angle(p.ra * Unit::hour_angle), Angle(p.dec * Unit::deg), frame, ScalarVelocity(p.rv * Unit::km / Unit::s));
-  if(!test.check("from_cirs()", cirs2.to_cirs() == cirs.to_cirs())) n++;
+  if(!test.check("from_cirs()", cirs2.cirs() == cirs.cirs())) n++;
 
   if(!test.check("from_tod_sky_pos()", Apparent::from_tod_sky_pos(frame, &p).is_valid())) n++;
 

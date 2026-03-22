@@ -2270,7 +2270,7 @@ public:
   Equatorial equatorial() const;
 
   /// @ingroup equatorial
-  Equatorial to_cirs() const;
+  Equatorial cirs() const;
 
   /// @ingroup nonequatorial
   Ecliptic ecliptic() const;

@@ -229,7 +229,7 @@ Coordinate Apparent::distance() const {
  *
  * @return    the apparent equatorial coordinates in the system in which they were defined.
  *
- * @sa to_cirs(), ecliptic(), galactic(), to_horizontal()
+ * @sa cirs(), ecliptic(), galactic(), to_horizontal()
  */
 Equatorial Apparent::equatorial() const {
   Equatorial e(_pos.ra * Unit::hour_angle, _pos.dec * Unit::deg, Equinox::tod(_frame.time()));
@@ -246,10 +246,10 @@ Equatorial Apparent::equatorial() const {
  *
  * @sa equatorial(), ecliptic(), galactic(), to_horizontal()
  */
-Equatorial Apparent::to_cirs() const {
+Equatorial Apparent::cirs() const {
   Equatorial e((_pos.ra - cirs2tod_ra) * Unit::hour_angle, _pos.dec * Unit::deg, Equinox::cirs(_frame.time()));
   if(!e.is_valid())
-    novas_trace_invalid("Apparent::to_cirs()");
+    novas_trace_invalid("Apparent::cirs()");
   return e;
 }
 

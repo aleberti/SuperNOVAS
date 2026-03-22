@@ -127,7 +127,7 @@ because _(a)_ the optionals are not supported on Apple and Windows (in 2026), an
 constructors.
 
 Instead all __SuperNOVAS__ classes are based on a `supernovas::Validating` base class, providing an `is_valid()` 
-method. All subclasses (that is all __SuperNOVAS__) classes sanity check their data as part of their constructor. And, 
+method. All subclasses (that is all __SuperNOVAS__ classes) sanity check their data as part of their constructor. And, 
 mutable classes sanity check every time they are modified as well. The checks typically include flagging NaNs and 
 infinite values (unless they are explicitly allowed), enum values outside of their normal range (yes the compiler 
 checks for these, but those checks can be easily bypassed), and whatever else is necessary to ensure that the objects 
@@ -389,8 +389,8 @@ equinoxes just like we did for the equatorial:
 ```
 
 Above the `>>` operator is used as a shorthand for the `.to_system()` method. It's the same as writing 
-`to_system(NOVAS_ICRS)`. For spectroscopic applications, you can get a spectroscopic radial velocity or redshift 
-(including gravitational effects) as:
+`.to_system(NOVAS_J2000)` or `.to_j2000()`. For spectroscopic applications, you can get a spectroscopic radial 
+velocity or redshift (including gravitational effects) as:
 
 ```cpp
  ScalarVelocity rv = app.radial_velocity();
@@ -472,13 +472,13 @@ observed light originated from the source (at the distance defined or assumed):
 Or, calculate the geometric position relative to the SSB instead...
 
 ```cpp
- AstrometricPosition pos_ssb = app.astrometric_position().referenced_to_ssb();
+ AstrometricPosition ssb_pos = app.astrometric_position().referenced_to_ssb();
 ```
 
 And finally, you can calculate nominal SSB-based ICRS coordinates as:
 
 ```cpp
- Equatorial icrs = pos_ssb.as_equatorial().to_icrs();
+ Equatorial icrs = ssb_pos.as_equatorial().to_icrs();
 ```
 
 

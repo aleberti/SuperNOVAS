@@ -58,9 +58,6 @@ jobs:
     - name: Generate headless README
       run: make -C doc README.md
 
-    - name: Set header location
-      run: sed -i "s:\$(DOXYGEN_HTML_HEADER):resources/header.html:g" doc/c*/Doxyfile
-
     - uses: mattnotmitt/doxygen-action@edge
       with:
         working-directory: 'doc/c99'
@@ -70,6 +67,9 @@ jobs:
       with:
         working-directory: 'doc/cpp'
         additional-packages: font-roboto
+
+    - name: Insert Google analytics tracker
+      run: for file in doc/c*/html/*.html ; do sudo sed -i "/<\/head>/e cat resources/analytics.html" $file ; done
 
     - name: Checkout gh-pages
       uses: actions/checkout@v6

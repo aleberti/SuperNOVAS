@@ -19,9 +19,9 @@ namespace supernovas {
  * Instantiates a new observing site with the specified geodetic location on the reference ellipsoid
  * of choice.
  *
- * @param longitude_rad   [rad] Observer's geodetic longitude
- * @param latitude_rad    [rad] Observer's geodetic latitude
- * @param altitude_m      [m] (optional) Observers's altitude above sea level (default: 0 m)
+ * @param longitude_rad   [rad] %Observer's geodetic longitude
+ * @param latitude_rad    [rad] %Observer's geodetic latitude
+ * @param altitude_m      [m] (optional) %Observers's altitude above sea level (default: 0 m)
  * @param ellipsoid       (optional) reference ellipsoid to use (default: NOVAS_GRS80_ELLIPSOID)
  *
  * @sa from_xyz(), from_GPS()
@@ -56,9 +56,9 @@ Site::Site(double longitude_rad, double latitude_rad, double altitude_m, enum no
  * Constructs a new observing site with the specified geodetic location on the reference ellipsoid
  * of choice.
  *
- * @param longitude       Observer's geodetic longitude
- * @param latitude        Observer's geodetic latitude
- * @param altitude        (optional) Observers's altitude above sea level (default: 0 m)
+ * @param longitude       %Observer's geodetic longitude
+ * @param latitude        %Observer's geodetic latitude
+ * @param altitude        (optional) %Observers's altitude above sea level (default: 0 m)
  * @param ellipsoid       (optional) reference ellipsoid to use (default: NOVAS_GRS80_ELLIPSOID)
  *
  * @sa from_xyz(), Site::from_GPS()

@@ -60,7 +60,7 @@ Geometric Geometric::operator>>(enum novas_reference_system system) const {
 }
 
 /**
- * Returns the observing frame for which these geometric c Geometric coordinates were defined.
+ * Returns the observing frame for which these geometric coordinates were defined.
  *
  * @return    a reference to the observing frame (observer location and time of observation)
  *

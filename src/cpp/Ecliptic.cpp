@@ -364,7 +364,7 @@ Ecliptic Ecliptic::to_tod(const Time& time) const {
 }
 
 /**
- * Returns a reference to a statically defined standard invalid Galactic coordinates. These invalid
+ * Returns a reference to a statically defined standard invalid %Galactic coordinates. These invalid
  * coordinates may be used inside any object that is invalid itself.
  *
  * @return    a reference to the static standard invalid coordinates.
@@ -388,9 +388,9 @@ Equatorial Ecliptic::to_equatorial() const {
 }
 
 /**
- * Converts these ecliptic coordinates to equivalent Galactic coordinates
+ * Converts these ecliptic coordinates to equivalent %Galactic coordinates
  *
- * @return    the equivalent Galactic coordinates for the same place on sky.
+ * @return    the equivalent %Galactic coordinates for the same place on sky.
  *
  * @sa Galactic::to_ecliptic(), to_equatorial()
  */

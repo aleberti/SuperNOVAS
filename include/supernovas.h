@@ -979,7 +979,7 @@ public:
 class Galactic : public Spherical {
 private:
 
-  /// Instantiates undefined Galactic coordinates
+  /// Instantiates undefined %Galactic coordinates
   Galactic() : Spherical() {}
 
 public:
@@ -1799,7 +1799,7 @@ public:
 };
 
 /**
- * Defines the astrometric parameters of a sidereal source, such as a star, a Galactic cloud, a
+ * Defines the astrometric parameters of a sidereal source, such as a star, a %Galactic cloud, a
  * distant galaxy, or a quasar.
  *
  * NOTES:

@@ -21,11 +21,11 @@ namespace supernovas {
  * referenced to a specified time (when observed light originated from this position) and a
  * Solar-system barycentric observer location.
  *
- * @param equ_pos       Equatorial rectangual position vector defined relative to the reference
+ * @param equ_pos       %Equatorial rectangual position vector defined relative to the reference
  *                      place.
  * @param time          Time of observation
- * @param ref_pos       Observer location relative to the Solar System Barycenter (SSB).
- * @param system        Equatorial coordinate reference system type used for the position and
+ * @param ref_pos       %Observer location relative to the Solar System Barycenter (SSB).
+ * @param system        %Equatorial coordinate reference system type used for the position and
  *                      observer location (default: TOD).
  */
 AstrometricPosition::AstrometricPosition(const Position& equ_pos, const Time &time, const Position& ref_pos, enum novas_reference_system system) :
@@ -55,10 +55,10 @@ AstrometricPosition::AstrometricPosition(const Position& equ_pos, const Time &ti
  * Instantiates an astrometric position from a true-of-date (TOD) equatorial position vector
  * references to an observing frame.
  *
- * @param equ_pos       Equatorial rectangual position vector defined relative to the reference
+ * @param equ_pos       %Equatorial rectangual position vector defined relative to the reference
  *                      place.
  * @param frame         Observing frame (observer location and time of observation).
- * @param system        (optional) Equatorial coordinate reference system type used for the
+ * @param system        (optional) %Equatorial coordinate reference system type used for the
  *                      position and observer location (default: TOD).
  */
 AstrometricPosition::AstrometricPosition(const Position& equ_pos, const Frame &frame, enum novas_reference_system system) :
@@ -122,8 +122,7 @@ Time AstrometricPosition::obs_time() const {
  *                    which this position was defined, at the time it is observed at the reference
  *                    position in the solar-system. It does not contain aberration corrections for
  *                    a moving observer, nor gravitational deflection around the major
- *                    Solar-system bodies. Both of those are included in `Apparent` places
- *                    instead.
+ *                    Solar-system bodies. Both of those are included in Apparent places instead.
  *
  * @sa Apparent::equatorial()
  */

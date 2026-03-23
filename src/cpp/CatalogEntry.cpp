@@ -95,7 +95,7 @@ CatalogEntry::CatalogEntry(const std::string &name, const Equatorial& coords) : 
  *
  * See CatalogEntry(strd::string&, Equatorial&) for more information on using builder patterns.
  *
- * @param name      Source name. It is treated case insensitively, unless the user calls
+ * @param name      %Source name. It is treated case insensitively, unless the user calls
  *                  `novas_case_sensitive(true)` prior to instantiation. The user may chose
  *                  any name that is appropriate for their application.
  * @param coords    Catalog coordinates (ecliptic)
@@ -117,10 +117,10 @@ CatalogEntry::CatalogEntry(const std::string &name, const Ecliptic& coords)
  * See CatalogEntry(strd::string&, Equatorial&) for more information on using builder patterns.
  *
  * NOTES:
- *  1. The Galactic coordinate system is somewhat ambigiously defined (see Liu+2011). As a result
+ *  1. The %Galactic coordinate system is somewhat ambigiously defined (see Liu+2011). As a result
  *     one should probably avoid using it when high precision is required.
  *
- * @param name      Source name. It is treated case insensitively, unless the user calls
+ * @param name      %Source name. It is treated case insensitively, unless the user calls
  *                  `novas_case_sensitive(true)` prior to instantiation. The user may chose
  *                  any name that is appropriate for their application.
  * @param coords    Catalog coordinates (galactic)

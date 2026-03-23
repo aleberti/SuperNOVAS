@@ -212,7 +212,7 @@ Velocity Frame::observer_velocity() const {
  * Note, that the returned frame may be invalid, if the this observer or the time argument
  * themselves are invalid.
  *
- * @param obs       Observer location
+ * @param obs       %Observer location
  * @param time      Astrometric time of observation
  * @return          A reduced accuracy observing frame for the specified time of observation.
  *

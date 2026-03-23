@@ -183,7 +183,7 @@ Ecliptic Galactic::to_ecliptic() const {
  *                    (default: units and spaces).
  * @param decimals    (optional) the number of decimal places to print for the seconds
  *                    (default: 3)
- * @return  the human-readable string representation of these Galactic coordinates.
+ * @return  the human-readable string representation of these %Galactic coordinates.
  */
 std::string Galactic::to_string(enum novas_separator_type separator, int decimals) const {
   return "GAL " + Spherical::to_string(separator, decimals);

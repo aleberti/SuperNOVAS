@@ -282,7 +282,7 @@ std::string Equinox::to_string() const {
 }
 
 /**
- * Returns a new Equinox instance from a string, such as 'ICRS', 'J2000', 'FK5', B1950', or
+ * Returns a new equinox instance from a string, such as 'ICRS', 'J2000', 'FK5', B1950', or
  * 'HIP'; or else `{}`. It is generally preferable to use one of the other static
  * initializers, such as icrs(), or j2000(), which are guaranteed to return a valid instance.
  *
@@ -345,7 +345,7 @@ Equinox Equinox::from_string(const std::string& name) {
 }
 
 /**
- * Returns a new Equinox given a coordinate reference system type and a date.
+ * Returns a new equinox instance given a coordinate reference system type and a date.
  *
  * @param system    The coordinate reference system type
  * @param jd_tt     [day] The (TT-based) Julian date (for dynamical systems).

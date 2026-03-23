@@ -174,7 +174,7 @@ const Position& Position::origin() {
  * instance is an equatorial rectangular position vector in the specified observing frame.
  *
  * @param frame         Observing frame (observer location and time of observation)
- * @param system        (optional) Equatorial coordinate reference system type used for the
+ * @param system        (optional) %Equatorial coordinate reference system type used for the
  *                      position and observer location (default: TOD).
  *
  * @return              the astrometric position for this observed equatorial position vector,

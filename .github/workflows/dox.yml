@@ -58,6 +58,9 @@ jobs:
     - name: Generate headless README
       run: make -C doc README.md
 
+    - name: Set header location
+      run: sed -i "s:\$(DOXYGEN_HTML_HEADER):resources/header.html:g" doc/c*/Doxyfile
+
     - uses: mattnotmitt/doxygen-action@edge
       with:
         working-directory: 'doc/c99'

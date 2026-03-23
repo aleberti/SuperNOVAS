@@ -194,6 +194,11 @@ Geometric Geometric::to_system(const novas_frame *f, enum novas_reference_system
  * reference system. For dynamical coordinate systems, the result is in the coordinate epoch
  * of observation.
  *
+ * Note, that using this pathway (as `to_system().equatorial()`) for converting
+ * geometric positions to different equatorial systems is typically much faster than the
+ * equivalent but slower `equatorial().to_system()`, since this method uses transformations
+ * that are readily available for the observing frame.
+ *
  * @param system    the new coordinate reference system type
  * @return          geometric coordinates for the same position and velocity as this, but
  *                  expressed in the other type of coordinate reference system.

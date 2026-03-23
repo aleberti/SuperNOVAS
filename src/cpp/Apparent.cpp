@@ -227,7 +227,7 @@ Coordinate Apparent::distance() const {
  * Returns the apparent equatorial coordinates on the sky, with respect to the true equator and
  * equinox of date (True-of-Date; TOD).
  *
- * @return    True-of-date (TOD) equatorial coordinates.
+ * @return    True-of-date (TOD) equatorial coordinates in the observing frame.
  *
  * @sa cirs(), ecliptic(), galactic(), to_horizontal()
  */
@@ -243,7 +243,7 @@ Equatorial Apparent::equatorial() const {
  * System (CIRS). CIRS is defined on the true equator of date, but its origin is the Celestial
  * Intermediate Origin (CIO), not the true equinox of date.
  *
- * @return    the CIRS equatorial coordinates.
+ * @return    the CIRS equatorial coordinates in the observing frame.
  *
  * @sa equatorial(), ecliptic(), galactic(), to_horizontal()
  */
@@ -339,7 +339,6 @@ AstrometricPosition Apparent::astrometric_position() const {
     novas_trace_invalid("Apparent::astrometric_position()");
     return AstrometricPosition(Position::undefined(), _frame, NOVAS_TOD);
   }
-
   return AstrometricPosition(Position(p, Unit::au), _frame, NOVAS_TOD);
 }
 

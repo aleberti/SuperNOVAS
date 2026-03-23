@@ -1129,7 +1129,6 @@ Below is a non-exhaustive overview new features added by __SuperNOVAS__ on top o
 
  - Introducing a new, high-level, C++11 API (`supernovas++`) on top of the standard C99 one.
  
- 
 </details>
 
 <a name="api-changes"></a>

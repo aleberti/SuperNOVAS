@@ -1,14 +1,14 @@
 # C99 Usage
 
+This guide is specifically for using __SuperNOVAS__ as a C99 library. There is a separate guide for 
+[using the C++11 API](USAGE-CPP.md). The links below let you jump to the relevant sections:
+
  - [Building your application with SuperNOVAS (C99)](#integration-c99)
  - [Example C99 usage](#examples-c99)
  - [Tips &amp; Tricks (C99)](#tips-c99)
 
-This guide is specifically for using __SuperNOVAS__ for your application via its C99 API. There is a separate guide 
-for [using the C++11 API](USAGE-CPP.md).
-
-__SuperNOVAS__ is a C99 library at its core. If you are looking for maximum speed, or want to use SuperNOVAS on older 
-platforms, the C99 API is there for you. 
+__SuperNOVAS__ is a C99 library at its core. If you are looking for maximum speed, or want to use __SuperNOVAS__ on 
+older platforms, the C99 API is there for you. 
 
 The following links provide further useful documentation resources for you:
  
@@ -567,7 +567,7 @@ they use a `novas_planet_provider` function to access ephemeris data with their 
   
  // Mars will be handled by the planet provider function
  make_planet(NOVAS_MARS, &mars);
-  
+   without background checks
  // Ceres will be handled by the generic ephemeris provider function, which let's say 
  // uses the NAIF ID of 2000001 _or_ the name 'Ceres' (depending on the implementation)
  make_ephem_object("Ceres", 2000001, &ceres);

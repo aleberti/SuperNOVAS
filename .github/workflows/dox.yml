@@ -26,6 +26,7 @@ on:
       - 'Makefile'
       - '*.md'
       - '.github/workflows/dox.yml'
+
 jobs:
 
   apidocs:
@@ -114,7 +115,6 @@ jobs:
         git config --global user.name "github-actions"
         git add -A
         git commit -m "[automated site update]" && git push || true
-
 
   changelog-update:
     name: Update CHANGELOG on github pages

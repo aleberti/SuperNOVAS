@@ -12,6 +12,7 @@ on:
       - main
     paths:
       - 'doc/**'
+      - 'resources/**'
       - 'src/**'
       - 'include/**'
       - 'Makefile'
@@ -21,6 +22,7 @@ on:
   pull_request:
     paths:
       - 'doc/**'
+      - 'resources/**'
       - 'src/**'
       - 'include/**'
       - 'Makefile'

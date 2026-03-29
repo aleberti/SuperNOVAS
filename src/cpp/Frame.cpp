@@ -215,10 +215,10 @@ Velocity Frame::observer_velocity() const {
  *
  * REFERENCES:
  *
- *  - Chapront-Touze, M., &amp; Chapront, J., A&amp;A, 190, 342 (1988)
- *  - Chapront, J., Francou G., 2003, A&amp;A, 404, 735
- *  - Chapront, J., &amp; Francou, G., "LUNAR SOLUTION ELP version ELP/MPP02", (October 2002),
- *    https://cyrano-se.obspm.fr/pub/2_lunar_solutions/2_elpmpp02/
+ *  1. Chapront-Touze, M., &amp; Chapront, J., A&amp;A, 190, 342 (1988)
+ *  2. Chapront, J., Francou G., 2003, A&amp;A, 404, 735
+ *  3. Chapront, J., &amp; Francou, G., "LUNAR SOLUTION ELP version ELP/MPP02", (October 2002),
+ *     https://cyrano-se.obspm.fr/pub/2_lunar_solutions/2_elpmpp02/
  *
  * @param limit_term    (optional) [arcsec|km] Sum only the harmonic terms with amplitudes larger
  *                      than this limit.
@@ -250,10 +250,10 @@ Geometric Frame::geometric_moon_elp2000(double limit_term) const {
  *
  * REFERENCES:
  *
- *  - Chapront-Touze, M., &amp; Chapront, J., A&amp;A, 190, 342 (1988)
- *  - Chapront, J., Francou G., 2003, A&amp;A, 404, 735
- *  - Chapront, J., &amp; Francou, G., "LUNAR SOLUTION ELP version ELP/MPP02", (October 2002),
- *    https://cyrano-se.obspm.fr/pub/2_lunar_solutions/2_elpmpp02/
+ *  1. Chapront-Touze, M., &amp; Chapront, J., A&amp;A, 190, 342 (1988)
+ *  2. Chapront, J., Francou G., 2003, A&amp;A, 404, 735
+ *  3. Chapront, J., &amp; Francou, G., "LUNAR SOLUTION ELP version ELP/MPP02", (October 2002),
+ *     https://cyrano-se.obspm.fr/pub/2_lunar_solutions/2_elpmpp02/
  *
  * @param limit_term    (optional) [arcsec|km] Sum only the harmonic terms with amplitudes larger
  *                      than this limit.

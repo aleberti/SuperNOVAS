@@ -44,13 +44,17 @@ int main() {
   Geometric mg = a.geometric_moon_elp2000(0.1);
   if(!test.check("geometric_moon_elp2000()", mg.is_valid())) n++;
   if(!test.check("geometric_moon_elp2000().position()", mg.position() == Position(mp, Unit::AU))) n++;
-  if(!test.check("geometric_moon_elp2000().velocity()", mg.velocity() == Velocity(mp, Unit::AU / Unit::day))) n++;
+  if(!test.check("geometric_moon_elp2000().velocity()", mg.velocity() == Velocity(mv, Unit::AU / Unit::day))) n++;
 
   sky_pos mpos = {};
   novas_moon_elp_sky_pos_fp(a._novas_frame(), 0.1, NOVAS_TOD, &mpos);
   Apparent ma = a.apparent_moon_elp2000(0.1);
   if(!test.check("apparent_moon_elp2000()", ma.is_valid())) n++;
-  if(!test.check("apparent_moon_elp2000().position()", memcmp(ma._sky_pos(), &mpos, sizeof(sky_pos)) == 0)) n++;
+  if(!test.equals("apparent_moon_elp2000() ra", ma._sky_pos()->ra, mpos.ra, 1e-13)) n++;
+  if(!test.equals("apparent_moon_elp2000() dec", ma._sky_pos()->dec, mpos.dec, 1e-12)) n++;
+  if(!test.equals("apparent_moon_elp2000() dis", ma._sky_pos()->dis, mpos.dis, 1e-12)) n++;
+  if(!test.equals("apparent_moon_elp2000() rv", ma._sky_pos()->rv, mpos.rv, 1e-9)) n++;
+  if(!test.check("apparent_moon_elp2000() r_hat", Position(ma._sky_pos()->r_hat) == Position(mpos.r_hat))) n++;
 
   Frame b(gc, Time::j2000(), NOVAS_REDUCED_ACCURACY);
   if(!test.check("Frame(reduced accuracy).is_valid()", b.is_valid())) n++;

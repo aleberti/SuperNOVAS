@@ -17,7 +17,7 @@ build: libnovas.a $(TESTS)
 
 .PHONY: run
 run: build
-	@for prog in $(TESTS) ; do ./$${prog} ; done
+	@for prog in $(TESTS) ; do ./$${prog} || exit 1 ; done
 
 %Test: %Test.cpp $(CPP_OBJECTS)
 	$(CXX) -o $@ $(CPPFLAGS) -g $(CXXFLAGS) $^ $(LDFLAGS) libnovas.a

@@ -652,9 +652,6 @@ int novas_moon_elp_sky_pos_fp(const novas_frame *restrict frame, double limit, e
 
   prop_error(fn, novas_moon_elp_posvel_fp(frame, limit, NOVAS_ICRS, p, v), 0);
 
-  pos->dis = novas_vlen(p);
-  pos->rv = novas_vdot(pos->r_hat, v) / kms_to_auday;
-
   // Geocentric observer velocity (J2000)
   for(k = 0; k < 3; k++)
     vo[k] = novas_add_vel(frame->obs_vel[k], -frame->earth_vel[k]);
@@ -665,10 +662,14 @@ int novas_moon_elp_sky_pos_fp(const novas_frame *restrict frame, double limit, e
   // convert to output system
   prop_error(fn, novas_make_transform(frame, NOVAS_ICRS, sys, &T), 0);
   novas_transform_vector(p, &T, p);
+  novas_transform_vector(v, &T, v);
+
   vector2radec(p, &pos->ra, &pos->dec);
 
+  pos->dis = novas_vlen(p);
   for(k = 3; --k >= 0; )
     pos->r_hat[k] = p[k] / pos->dis;
+  pos->rv = novas_vdot(pos->r_hat, v) / kms_to_auday;
 
   return 0;
 }

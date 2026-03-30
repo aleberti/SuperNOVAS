@@ -62,7 +62,7 @@ int main() {
   // Specify the location we are observing from
   // 50.7374 deg N, 7.0982 deg E, 60m elevation (GPS / WGS84)
   // (You can set local weather parameters after...)
-  auto obs = Observer::on_earth(Site::from_GPS(50.7374, 7.0982, 60.0), eop);
+  auto obs = Observer::on_earth(Site::from_GPS(7.0982 * Unit::deg, 50.7374 * Unit::deg, 60.0 * Unit::m), eop);
 
 
   // -------------------------------------------------------------------------

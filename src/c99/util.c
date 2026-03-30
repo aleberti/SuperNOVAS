@@ -925,9 +925,9 @@ int novas_print_dms(double degrees, enum novas_separator_type sep, int decimals,
       decimals = MAX_SECONDS_DECIMALS;
 
     if(decimals > 0)
-      novas_snprintf(fmt, len, "%%4d%%s%%02d%%s%%02d.%%0%dlld%%s", decimals);
+      novas_snprintf(fmt, sizeof(fmt), "%%4d%%s%%02d%%s%%02d.%%0%dlld%%s", decimals);
     else
-      novas_snprintf(fmt, len, "%%4d%%s%%02d%%s%%02d%%s");
+      novas_snprintf(fmt, sizeof(fmt), "%%4d%%s%%02d%%s%%02d%%s");
 
     degrees = remainder(degrees, DEG360);
     if(degrees < 0.0) {

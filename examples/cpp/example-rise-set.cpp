@@ -61,7 +61,6 @@ int main(int argc, const char *argv[]) {
   auto source = Planet::sun();
 
 
-
   // -------------------------------------------------------------------------
   // Define observer somewhere on Earth (we can also define observers in Earth
   // or Sun orbit, at the geocenter or at the Solary-system barycenter...)
@@ -70,7 +69,6 @@ int main(int argc, const char *argv[]) {
   // 50.7374 deg N, 7.0982 deg E, 60m elevation (GPS / WGS84)
   // (You can set local weather parameters after...)
   auto obs = Observer::on_earth(Site::from_GPS(7.0982 * Unit::deg, 50.7374 * Unit::deg, 60.0 * Unit::m), eop);
-
 
 
   // -------------------------------------------------------------------------
@@ -97,7 +95,6 @@ int main(int argc, const char *argv[]) {
   //Time t(&ts, eop);
 
 
-
   // -------------------------------------------------------------------------
   // You might want to set a provider for precise planet positions so we might
   // calculate Earth, Sun and major planet positions accurately. If an planet
@@ -108,18 +105,21 @@ int main(int argc, const char *argv[]) {
   // you may use the CALCEPH library:
   //
   // t_calcephbin *planets = calceph_open("path/to/de440s.bsp");
-  // novas_use_calceph(planets);
+  // novas_use_calcep_planets(planets);
+
 
   // -------------------------------------------------------------------------
   // Without a planet provider, we are stuck with reduced (mas) precisions
   // only...
   enum novas_accuracy accuracy = NOVAS_REDUCED_ACCURACY;
 
+
   // -------------------------------------------------------------------------
   // Initialize the observing frame with the given observer location and
   // time of observation. Without a planet provider, we are stuck with reduced
   // (mas) precisions only...
   auto frame = obs.frame_at(t, accuracy);
+
 
   // -------------------------------------------------------------------------
   // Print source name to output
@@ -147,6 +147,7 @@ int main(int argc, const char *argv[]) {
     std::cout << " will rise above " << el.to_string() << " degrees at  : " << t_rise.to_string() << "\n";
   }
 
+
   // -------------------------------------------------------------------------
   // Calculate next UTC-based date/time source transits at observer location
   Time t_transit = source.transits_in(frame);
@@ -165,6 +166,11 @@ int main(int argc, const char *argv[]) {
   else {
     std::cout << " will set below " << el.to_string() << " degrees at  : " << t_rise.to_string() << "\n";
   }
+
+
+  // -------------------------------------------------------------------------
+  // Clean up before we exit...
+  //calceph_close(planets);
 
   return 0;
 }

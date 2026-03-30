@@ -93,10 +93,12 @@ int main() {
   // you may use the CALCEPH library:
   //
   // t_calcephbin *planets = calceph_open("path/to/de440s.bsp");
-  // novas_use_calceph(planets);
+  // novas_use_calceph_planets(planets);
   //
   // accuracy = NOVAS_FULL_ACCURACY;      // sub-uas precision
 
+
+  // -------------------------------------------------------------------------
   // Without a planet provider, we are stuck with reduced (mas) precisions
   // only...
   accuracy = NOVAS_REDUCED_ACCURACY;      // mas-level precision, typically
@@ -158,6 +160,11 @@ int main() {
   // Print timestamp of full-moon
   novas_timestamp(&full_time, NOVAS_UTC, ts, sizeof(ts));
   printf(" next full moon is at %s\n", ts);
+
+
+  // -------------------------------------------------------------------------
+  // Clean up before we exit...
+  //calceph_close(planets);
 
   return 0;
 }

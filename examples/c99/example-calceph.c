@@ -77,13 +77,17 @@ int main(int argc, const char *argv[]) {
   // Make de440 provide ephemeris data for the major planets.
   novas_use_calceph_planets(de440);
 
-  // We could specify to use a calceph ephemeris binary for generic
-  // Solar-systems sources also (including planets too if
-  // novas_use_calceph_planets() is not called separately
+  // We could also use further ephemeris binary for various other Solar-systems
+  // sources also is not called separately
   //
   // E.g. Jovian satellites:
   // t_calcephbin jovian = calceph_open("/path/to/jup365.bsp");
   // novas_use_calceph(jovian);
+  //
+  // Or, *both* the main Jovian and Saturnian satellites:
+  // t_calcephbin moons = calceph_open_array("/path/to/jup365.bsp", "/path/to/sat441.bsp");
+  // novas_use_calceph(moons);
+
 
   // Since we have an ephemeris provider for major planets, we can unlock the
   // ultimate accuracy of SuperNOVAS.
@@ -179,6 +183,15 @@ int main(int argc, const char *argv[]) {
 
   // Let's print the calculated azimuth and elevation
   printf(" Az = %.6f deg, El = %.6f deg\n", az, el);
+
+
+
+  // -------------------------------------------------------------------------
+  // Clean up before we exit...
+  calceph_close(de440);
+  //calceph_close(jovian);
+  //calceph_close(moons);
+
 
   return 0;
 }

@@ -157,10 +157,12 @@ int main(int argc, const char *argv[]) {
   // you may use the CALCEPH library:
   //
   // t_calcephbin *planets = calceph_open("path/to/de440s.bsp");
-  // novas_use_calceph(planets);
+  // novas_use_calceph_planets(planets);
   //
   // accuracy = NOVAS_FULL_ACCURACY;      // sub-uas precision
 
+
+  // -------------------------------------------------------------------------
   // Without a planet provider, we are stuck with reduced (mas) precisions
   // only...
   accuracy = NOVAS_REDUCED_ACCURACY;      // mas-level precision, typically
@@ -217,6 +219,11 @@ int main(int argc, const char *argv[]) {
     novas_iso_timestamp(&ts, timestamp, sizeof(timestamp));
     printf(" will set below %5.1f degrees at   : %s\n", el, timestamp);
   }
+
+
+  // -------------------------------------------------------------------------
+  // Clean up before we exit...
+  //calceph_close(planets);
 
   return 0;
 }

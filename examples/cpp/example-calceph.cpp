@@ -66,6 +66,16 @@ int main(int argc, const char *argv[]) {
   // Make de440 provide ephemeris data for the major planets.
   novas_use_calceph_planets(de440);
 
+  // We could also use further ephemeris binaries for generic
+  // Solar-systems sources also  is not called separately
+  //
+  // E.g. Jovian satellites:
+  // t_calcephbin jovian = calceph_open("/path/to/jup365.bsp");
+  // novas_use_calceph(jovian);
+  //
+  // Or, *both* the main Jovian and Saturnian satellites:
+  // t_calcephbin moons = calceph_open_array("/path/to/jup365.bsp", "/path/to/sat441.bsp");
+  // novas_use_calceph(moons);
 
 
   // -------------------------------------------------------------------------
@@ -77,10 +87,10 @@ int main(int argc, const char *argv[]) {
   // ... Or, to define a minor body, such as an asteroid or satellite
   //auto source = EphemerisSource("Io", 501);
 
+
   // -------------------------------------------------------------------------
   // If the object uses CALCEPH IDs instead of NAIF, then
   //novas_calceph_use_ids(NOVAS_ID_CALCEPH);
-
 
 
   // -------------------------------------------------------------------------
@@ -123,7 +133,6 @@ int main(int argc, const char *argv[]) {
   //Time t(&ts, eop);
 
 
-
   // -------------------------------------------------------------------------
   // Initialize the observing frame with the given observer location and
   // time of observation. Without a planet provider, we are stuck with reduced
@@ -133,7 +142,6 @@ int main(int argc, const char *argv[]) {
   // Or, if you are using CALCEPH without planetary ephemeris data (e.g.
   // de440s.bsp), you will be stuck with reduced (mas) precisions only...
   //auto frame = obs.reduced_accuracy_frame_at(t);
-
 
 
   // -------------------------------------------------------------------------
@@ -158,6 +166,12 @@ int main(int argc, const char *argv[]) {
   // Let's print the calculated azimuth and elevation
   std::cout << hor.to_string() << "\n";
 
+
+  // -------------------------------------------------------------------------
+  // Clean up before we exit...
+  calceph_close(de440);
+  //calceph_close(jovian);
+  //calceph_close(moons);
 
   return 0;
 }

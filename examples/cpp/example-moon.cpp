@@ -76,7 +76,6 @@ int main() {
   //Time t(&ts, eop);
 
 
-
   // -------------------------------------------------------------------------
   // You might want to set a provider for precise planet positions so we might
   // calculate Earth, Sun and major planet positions accurately. If an planet
@@ -87,8 +86,7 @@ int main() {
   // you may use the CALCEPH library:
   //
   // t_calcephbin *planets = calceph_open("path/to/de440s.bsp");
-  // novas_use_calceph(planets);
-
+  // novas_use_calceph_planets(planets);
 
 
   // -------------------------------------------------------------------------
@@ -96,16 +94,19 @@ int main() {
   // only...
   enum novas_accuracy accuracy = NOVAS_REDUCED_ACCURACY;
 
+
   // -------------------------------------------------------------------------
   // Initialize the observing frame with the given observer location and
   // time of observation. Without a planet provider, we are stuck with reduced
   // (mas) precisions only...
   auto frame = obs.frame_at(t, accuracy);
 
+
   // -------------------------------------------------------------------------
   // Calculate the precise geometric position velocity vectors of the Moon
   // w.r.t. the observer
   //Geometric g = frame.geometric_moon_elp2000();
+
 
   // -------------------------------------------------------------------------
   // Calculate the precise apparent position of the Moon
@@ -113,6 +114,7 @@ int main() {
 
   // Let's print the apparent position
   std::cout << apparent.to_string() << "\n";
+
 
   // -------------------------------------------------------------------------
   // Convert the apparent position on sky to horizontal coordinates
@@ -129,13 +131,20 @@ int main() {
   // Let's print the calculated azimuth and elevation
   std::cout << hor.to_string() << "\n";
 
+
   // -------------------------------------------------------------------------
   // Let's print the phase of the moon
   std::cout << " phase = " <<  t.moon_phase().deg() << " deg\n";
 
+
   // -------------------------------------------------------------------------
   // Let's figure out when the next full moon is
   std::cout << " next full moon is at " << t.next_moon_phase(Angle(180.0 * Unit::deg)).to_string() << "\n";
+
+
+  // -------------------------------------------------------------------------
+  // Clean up before we exit...
+  //calceph_close(planets);
 
   return 0;
 }

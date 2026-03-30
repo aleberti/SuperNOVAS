@@ -89,7 +89,6 @@ int main() {
   //Time t(&ts, eop);
 
 
-
   // -------------------------------------------------------------------------
   // You might want to set a provider for precise planet positions so we might
   // calculate Earth, Sun and major planet positions accurately. If an planet
@@ -100,12 +99,14 @@ int main() {
   // you may use the CALCEPH library:
   //
   // t_calcephbin *planets = calceph_open("path/to/de440s.bsp");
-  // novas_use_calceph(planets);
+  // novas_use_calceph_planets(planets);
+
 
   // -------------------------------------------------------------------------
   // Without a planet provider, we are stuck with reduced (mas) precisions
   // only...
   enum novas_accuracy accuracy = NOVAS_REDUCED_ACCURACY;
+
 
   // -------------------------------------------------------------------------
   // Initialize the observing frame with the given observer location and
@@ -134,6 +135,10 @@ int main() {
 
   // Let's print the calculated azimuth and elevation
   std::cout << hor.to_string() << "\n";
+
+  // -------------------------------------------------------------------------
+  // Clean up before we exit...
+  //calceph_close(planets);
 
   return 0;
 }

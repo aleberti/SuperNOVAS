@@ -148,7 +148,13 @@ int main() {
   // you may use the CALCEPH library:
   //
   // t_calcephbin *planets = calceph_open("path/to/de440s.bsp");
-  // novas_use_calceph(planets);
+  // novas_use_calceph_planets(planets);
+
+
+  // -------------------------------------------------------------------------
+  // Without a planet provider, we are stuck with reduced (mas) precisions
+  // only...
+  accuracy = NOVAS_REDUCED_ACCURACY;      // mas-level precision, typically
 
 
   // -------------------------------------------------------------------------
@@ -184,6 +190,11 @@ int main() {
 
   // Let's print the calculated azimuth and elevation
   printf(" Az = %.6f deg, El = %.6f deg\n", az, el);
+
+
+  // -------------------------------------------------------------------------
+  // Clean up before we exit...
+  //calceph_close(planets);
 
   return 0;
 }

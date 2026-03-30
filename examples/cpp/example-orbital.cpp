@@ -106,7 +106,6 @@ int main() {
   auto callisto = orbit.to_source("Callisto");
 
 
-
   // -------------------------------------------------------------------------
   // Define observer somewhere on Earth (we can also define observers in Earth
   // or Sun orbit, at the geocenter or at the Solary-system barycenter...)
@@ -141,7 +140,6 @@ int main() {
   //Time t(&ts, eop);
 
 
-
   // -------------------------------------------------------------------------
   // You might want to set a provider for precise planet positions so we might
   // calculate Earth, Sun and major planet positions accurately. If an planet
@@ -152,12 +150,14 @@ int main() {
   // you may use the CALCEPH library:
   //
   // t_calcephbin *planets = calceph_open("path/to/de440s.bsp");
-  // novas_use_calceph(planets);
+  // novas_use_calceph_planets(planets);
+
 
   // -------------------------------------------------------------------------
   // Without a planet provider, we are stuck with reduced (mas) precisions
   // only...
   enum novas_accuracy accuracy = NOVAS_REDUCED_ACCURACY;
+
 
   // -------------------------------------------------------------------------
   // Initialize the observing frame with the given observer location and
@@ -173,6 +173,7 @@ int main() {
   // Let's print the apparent position
   std::cout << "Ceres    : \n";
   std::cout << "  apparent  : " << apparent.to_string() << "\n";
+
 
   // -------------------------------------------------------------------------
   // Define local weather (for refraction correction)
@@ -196,6 +197,9 @@ int main() {
   std::cout << "Ceres    : \n";
   std::cout << "  apparent  : " << apparent.to_string() << "\n";
   std::cout << "  horizontal: " << hor.to_string() << "\n";
+
+  // Close the CALCEPH ephemeris files we used before we exit
+  //calceph_close(planets);
 
   return 0;
 }

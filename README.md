@@ -1183,6 +1183,9 @@ Below is a non-exhaustive overview new features added by __SuperNOVAS__ on top o
 
  - Introducing a new, high-level, C++11 API (`supernovas++`) on top of the standard C99 one.
  
+ - Added a truncated version of the ELP2000 / MPP02 semi-analytical model of the Moon (Chapront &amp; Francou 2003),
+   allowing arcsec (km) level position calculations for the Moon even without ephemeris data.
+   
 </details>
 
 <a name="api-changes"></a>

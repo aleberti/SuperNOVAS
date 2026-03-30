@@ -185,13 +185,11 @@ int main(int argc, const char *argv[]) {
   printf(" Az = %.6f deg, El = %.6f deg\n", az, el);
 
 
-
   // -------------------------------------------------------------------------
   // Clean up before we exit...
   calceph_close(de440);
   //calceph_close(jovian);
   //calceph_close(moons);
-
 
   return 0;
 }

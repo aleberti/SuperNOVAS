@@ -202,7 +202,7 @@ static int get_cspice_error(char *msg, int len) {
  * @author Attila Kovacs
  * @since 1.2
  *
- * @sa cspice_remove_kernel(), novas_use_cspice()
+ * @sa cspice_remove_kernel(), cspice_clear_kernels(), novas_use_cspice()
  */
 int cspice_add_kernel(const char *filename) {
   static const char *fn = "cspice_add_kernel";
@@ -248,7 +248,7 @@ int cspice_add_kernel(const char *filename) {
  * @author Attila Kovacs
  * @since 1.2
  *
- * @sa cspice_add_kernel()
+ * @sa cspice_add_kernel(), cspice_clear_kernels()
  */
 int cspice_remove_kernel(const char *filename) {
   static const char *fn = "cspice_remove_kernel";
@@ -271,6 +271,36 @@ int cspice_remove_kernel(const char *filename) {
 
   if(err)
     return novas_error(-1, EINVAL, fn, "unload_c(%s): %s", filename, msg);
+
+  return 0;
+}
+
+
+/**
+ * Closes and removes all SPICE kernels currently configured, freeing up the associated resources.
+ * However CSPICE will remain your ephemeris provider for planets and/or ephemeris type objects,
+ * as configured before.
+ *
+ * @return      0 if successful, or else -1 (errno will be set to EAGAIN).
+ *
+ * @author Attila Kovacs
+ * @since 1.6
+ *
+ * @sa cspice_remove_kernel(), cspice_add_kernel()
+ */
+int cspice_clear_kernels() {
+  char msg[100];
+  int err;
+
+  mutex_lock();
+  reset_c();
+  kclear_c();
+  err = get_cspice_error(msg, sizeof(msg));
+
+  mutex_unlock();
+
+  if(err)
+    return novas_error(-1, EAGAIN, "novas_cspice_clear()", "kclear_c(): %s", msg);
 
   return 0;
 }
@@ -638,4 +668,6 @@ int novas_use_cspice() {
   novas_use_cspice_ephem();
   return 0;
 }
+
+
 

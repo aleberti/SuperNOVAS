@@ -53,7 +53,6 @@ int main(int argc, const char *argv[]) {
   novas_debug(NOVAS_DEBUG_ON);
 
 
-
   // -------------------------------------------------------------------------
   // We'll use the NAIF CSPICE Toolkit to provide ephemeris data
 
@@ -73,7 +72,6 @@ int main(int argc, const char *argv[]) {
   novas_use_cspice();
 
 
-
   // -------------------------------------------------------------------------
   // Define a Solar-system source
 
@@ -86,7 +84,6 @@ int main(int argc, const char *argv[]) {
   // -------------------------------------------------------------------------
   // If the object uses CALCEPH IDs instead of NAIF, then
   //novas_calceph_use_ids(NOVAS_ID_CALCEPH);
-
 
 
   // -------------------------------------------------------------------------
@@ -140,7 +137,6 @@ int main(int argc, const char *argv[]) {
   //auto frame = obs.reduced_accuracy_frame_at(t);
 
 
-
   // -------------------------------------------------------------------------
   // Calculate the precise apparent position.
   Apparent apparent = source.apparent_in(frame);
@@ -163,6 +159,10 @@ int main(int argc, const char *argv[]) {
   // Let's print the calculated azimuth and elevation
   std::cout << hor.to_string() << "\n";
 
+
+  // -------------------------------------------------------------------------
+  // Clean up before we exit...
+  cspice_clear_kernels();
 
   return 0;
 }

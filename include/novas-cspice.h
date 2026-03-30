@@ -32,6 +32,10 @@ int cspice_add_kernel(const char *filename);
 /// @ingroup solar-system
 int cspice_remove_kernel(const char *filename);
 
+// ----------------- Added in v1.6.0 --------------------
+/// @ingroup solar-system
+int cspice_clear_kernels();
+
 #if __cplusplus
 } // extern "C"
 #endif

@@ -173,6 +173,11 @@ int main(int argc, const char *argv[]) {
   // Let's print the calculated azimuth and elevation
   printf(" Az = %.6f deg, El = %.6f deg\n", az, el);
 
+
+  // -------------------------------------------------------------------------
+  // Clean up before we exit...
+  cspice_clear_kernels();
+
   return 0;
 }
 

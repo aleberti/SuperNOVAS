@@ -194,11 +194,42 @@ static int unload_eph(const char *name) {
 static int test_remove_kernel() {
   int n = 0;
 
+  double pos[3], vel[3];
+  double jd = NOVAS_JD_J2000;
+  double jd2[2] = { jd, 0.0 };
+  enum novas_origin origin = NOVAS_BARYCENTER;
+  novas_planet_provider_hp pl = get_planet_provider_hp();
+  novas_ephem_provider eph = get_ephem_provider();
+
   if(!is_ok("remove_kernel:planets", unload_eph(PLANET_EPH))) n++;
+  if(check("remove_kernel:planets:check", 3, pl(jd2, NOVAS_JUPITER, NOVAS_BARYCENTER, pos, vel))) n++;
+
   if(!is_ok("remove_kernel:mars", unload_eph(MARS_EPH))) n++;
+  if(check("remove_kernel:mars:check", 3, eph("Phobos", 401, jd2[0], jd2[1], &origin, pos, vel))) n++;
 
   if(check("remove_kernel:null", -1, cspice_remove_kernel(NULL))) n++;
   if(check("remove_kernel:empty", -1, cspice_remove_kernel(""))) n++;
+
+  return n;
+}
+
+static int test_cspice_clear_kernels() {
+  int n = 0;
+
+  double pos[3], vel[3];
+  double jd = NOVAS_JD_J2000;
+  double jd2[2] = { jd, 0.0 };
+  enum novas_origin origin = NOVAS_BARYCENTER;
+  novas_planet_provider_hp pl = get_planet_provider_hp();
+  novas_ephem_provider eph = get_ephem_provider();
+
+  load_eph(PLANET_EPH);
+  load_eph(MARS_EPH);
+
+  if(!is_ok("clear_kernels", cspice_clear_kernels())) n++;
+
+  if(check("clear_kernels:jupiter", 3, pl(jd2, NOVAS_JUPITER, NOVAS_BARYCENTER, pos, vel))) n++;
+  if(check("clear_kernels:phobos", 3, eph("Phobos", 401, jd2[0], jd2[1], &origin, pos, vel))) n++;
 
   return n;
 }
@@ -241,6 +272,8 @@ int main(int argc, char *argv[]) {
   if(test_remove_kernel()) n++;
 
   if(test_cspice_is_thread_safe()) n++;
+
+  if(test_cspice_clear_kernels()) n++;
 
   if(n) fprintf(stderr, " -- FAILED %d tests\n", n);
   else fprintf(stderr, " -- OK\n");
